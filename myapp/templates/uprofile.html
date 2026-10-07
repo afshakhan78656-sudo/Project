@@ -1,0 +1,296 @@
+{% extends 'header.html' %}
+{% load static %}
+{% block content %}
+
+	<!-- Mobile Menu -->
+	<div class="menu trans_500">
+		<div class="menu_content d-flex flex-column align-items-center justify-content-center text-center">
+			<div class="menu_close_container"><div class="menu_close"></div></div>
+			<div class="logo menu_logo"><a href="#"><img src="{% static 'images/logo.png' %}" alt=""></a></div>
+			<ul>
+				<li class="menu_item"><a href="{% url 'index' %}">home</a></li>
+				<li class="menu_item"><a href="{% url 'about' %}">about us</a></li>
+				<li class="menu_item"><a href="offers.html">offers</a></li>
+				<li class="menu_item"><a href="blog.html">news</a></li>
+				<li class="menu_item"><a href="{% url 'contact' %}">contact</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<!-- Home Banner -->
+	<div class="home" style="height:40vh;min-height:300px;">
+		<div class="home_background parallax-window" data-parallax="scroll" data-image-src="{% static 'images/contact_background.jpg' %}"></div>
+		<div class="home_content" style="top:50%;">
+			<div class="home_title">My Profile</div>
+		</div>
+	</div>
+
+	<!-- Photo Lightbox Modal -->
+	<div id="photo_modal" onclick="if(event.target===this)closeModal()" style="
+		display:none;position:fixed;inset:0;z-index:9999;
+		background:rgba(0,0,0,0.78);align-items:center;justify-content:center;">
+		<div style="position:relative;width:300px;">
+			<img id="modal_img" src="" alt="Profile" style="
+				width:300px;height:300px;border-radius:50%;object-fit:cover;
+				border:4px solid #d4a84b;box-shadow:0 8px 48px rgba(0,0,0,0.5);display:block;">
+			<button onclick="closeModal()" style="
+				position:absolute;top:-12px;right:-12px;background:#d4a84b;
+				border:none;color:#fff;width:34px;height:34px;border-radius:50%;
+				font-size:18px;cursor:pointer;font-weight:700;line-height:1;
+				box-shadow:0 2px 8px rgba(0,0,0,0.25);">&times;</button>
+		</div>
+	</div>
+
+	<!-- Profile Section -->
+	<div class="contact_form_section" style="background:#f9f9f9;padding:70px 0 80px;">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-lg-8 col-md-10">
+
+					<!-- Card -->
+					<div style="background:#fff;border-radius:12px;box-shadow:0 4px 32px rgba(0,0,0,0.08);overflow:hidden;">
+
+						<!-- Card Top strip -->
+						<div style="height:6px;background:linear-gradient(90deg,#d4a84b,#e8c87a);"></div>
+
+						<div style="padding:48px 52px 52px;">
+
+							<!-- Messages -->
+							{% if messages %}
+								{% for message in messages %}
+								<div style="background:{% if 'error' in message.tags %}#fff5f5{% else %}#f0fff4{% endif %};color:{% if 'error' in message.tags %}#c0392b{% else %}#27ae60{% endif %};border-left:3px solid {% if 'error' in message.tags %}#c0392b{% else %}#27ae60{% endif %};padding:12px 16px;border-radius:6px;margin-bottom:28px;font-size:13.5px;">
+									{{ message }}
+								</div>
+								{% endfor %}
+							{% endif %}
+							{% if msg %}
+							<div style="background:#fff5f5;color:#c0392b;border-left:3px solid #c0392b;padding:12px 16px;border-radius:6px;margin-bottom:28px;font-size:13.5px;">
+								{{ msg }}
+							</div>
+							{% endif %}
+
+							<form action="{% url 'uprofile' %}" method="POST" enctype="multipart/form-data" style="margin:0;">
+								{% csrf_token %}
+
+								<!-- ── Profile Photo ── -->
+								<div style="text-align:center;margin-bottom:40px;">
+									<div id="avatar_wrap" title="Click to change photo" style="
+										position:relative;width:110px;height:110px;
+										margin:0 auto 10px;cursor:pointer;display:inline-block;">
+										<img id="avatar_img"
+											src="{% if request.session.profile %}{{ request.session.profile }}{% else %}{% static 'images/man.png' %}{% endif %}"
+											alt="Profile"
+											style="width:110px;height:110px;border-radius:50%;object-fit:cover;
+												border:3px solid #d4a84b;display:block;
+												box-shadow:0 4px 18px rgba(212,168,75,0.28);">
+										<div id="av_overlay" style="
+											position:absolute;inset:0;border-radius:50%;
+											background:rgba(0,0,0,0.40);
+											display:flex;flex-direction:column;
+											align-items:center;justify-content:center;
+											opacity:0;transition:opacity .2s;pointer-events:none;">
+											<svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+												stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+												<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+												<circle cx="12" cy="13" r="4"/>
+											</svg>
+											<span style="color:#fff;font-size:10px;margin-top:4px;font-weight:600;letter-spacing:.5px;">Change</span>
+										</div>
+									</div>
+									<br>
+									<a href="#" onclick="openModal();return false;" style="
+										font-size:12px;color:#d4a84b;text-decoration:none;font-weight:600;
+										letter-spacing:.3px;">&#128269; View full photo</a>
+									<input type="file" id="photo_input" name="profile_pic" accept="image/*" style="display:none;">
+								</div>
+
+								<!-- ── Personal Info ── -->
+								<div style="font-size:10.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#c8a84b;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
+									<span>Personal Information</span>
+									<div style="flex:1;height:1px;background:#f0f0f0;"></div>
+								</div>
+
+								<!-- First & Last Name -->
+								<div style="display:flex;gap:16px;margin-bottom:20px;">
+									<div style="flex:1;">
+										<label style="display:block;font-size:11px;font-weight:600;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;">First Name</label>
+										<input type="text" name="first_name"
+											value="{{ form.first_name.value|default:user.first_name }}"
+											placeholder="First Name"
+											style="width:100%;padding:11px 14px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:14px;color:#333;outline:none;transition:border .2s;box-sizing:border-box;">
+									</div>
+									<div style="flex:1;">
+										<label style="display:block;font-size:11px;font-weight:600;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;">Last Name</label>
+										<input type="text" name="last_name"
+											value="{{ form.last_name.value|default:user.last_name }}"
+											placeholder="Last Name"
+											style="width:100%;padding:11px 14px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:14px;color:#333;outline:none;transition:border .2s;box-sizing:border-box;">
+									</div>
+								</div>
+
+								<!-- Username (readonly) -->
+								<div style="margin-bottom:20px;">
+									<label style="display:block;font-size:11px;font-weight:600;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;">
+										 Username
+										<span style="font-size:10px;color:#d4a84b;font-weight:500;text-transform:none;letter-spacing:0;margin-left:6px;background:#fff8ec;padding:2px 8px;border-radius:20px;border:1px solid #f0dba8;">&#128274; cannot be changed</span>
+									</label>									
+									<input type="text" name="username" required
+										value="{{ form.username.value|default:user.username }}"
+										 readonly autocomplete="username"
+										style="width:100%;padding:11px 14px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:14px;color:#333;outline:none;box-sizing:border-box;">
+								</div>
+
+								<!-- Email (readonly) -->
+								<div style="margin-bottom:20px;">
+									<label style="display:block;font-size:11px;font-weight:600;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;">
+										Email Address
+										<span style="font-size:10px;color:#d4a84b;font-weight:500;text-transform:none;letter-spacing:0;margin-left:6px;background:#fff8ec;padding:2px 8px;border-radius:20px;border:1px solid #f0dba8;">&#128274; cannot be changed</span>
+									</label>
+									<input type="email" name="email" required
+										value="{{ form.email.value|default:user.email }}"
+										readonly autocomplete="email"
+										style="width:100%;padding:11px 14px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:14px;color:#bbb;background:#fafafa;cursor:not-allowed;outline:none;box-sizing:border-box;">
+								</div>
+
+								<!-- Mobile & City -->
+								<div style="display:flex;gap:16px;margin-bottom:32px;">
+									<div style="flex:1;">
+										<label style="display:block;font-size:11px;font-weight:600;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;">Mobile</label>
+										<input type="tel" name="mobile" required
+											value="{{ form.mobile.value|default:user.mobile }}"
+											placeholder="Mobile Number" autocomplete="tel"
+											style="width:100%;padding:11px 14px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:14px;color:#333;outline:none;box-sizing:border-box;">
+									</div>
+									<div style="flex:1;">
+										<label style="display:block;font-size:11px;font-weight:600;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;">City</label>
+										<input type="text" name="city"
+											value="{{ form.city.value|default:user.city }}"
+											placeholder="City"
+											style="width:100%;padding:11px 14px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:14px;color:#333;outline:none;box-sizing:border-box;">
+									</div>
+								</div>
+
+								<!-- ── Change Password ── -->
+								<div style="font-size:10.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#c8a84b;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
+									<span>Change Password</span>
+									<div style="flex:1;height:1px;background:#f0f0f0;"></div>
+								</div>
+
+								<p style="font-size:12.5px;color:#bbb;margin:0 0 18px;">Leave blank to keep your current password.</p>
+
+								<div style="display:flex;gap:16px;margin-bottom:36px;">
+									<div style="flex:1;">
+										<label style="display:block;font-size:11px;font-weight:600;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;">New Password</label>
+										<input type="password" name="password"
+											placeholder="New Password" autocomplete="new-password"
+											style="width:100%;padding:11px 14px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:14px;color:#333;outline:none;box-sizing:border-box;">
+									</div>
+									<div style="flex:1;">
+										<label style="display:block;font-size:11px;font-weight:600;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;">Confirm Password</label>
+										<input type="password" name="cpassword"
+											placeholder="Confirm Password" autocomplete="new-password"
+											style="width:100%;padding:11px 14px;border:1.5px solid #e8e8e8;border-radius:7px;font-size:14px;color:#333;outline:none;box-sizing:border-box;">
+									</div>
+								</div>
+
+								<!-- Submit Button -->
+								<button type="submit" class="form_submit_button button trans_200" style="
+									width:100%;text-align:center;padding:15px;
+									font-size:13px;letter-spacing:2px;text-transform:uppercase;font-weight:700;">
+									Save Changes<span></span><span></span><span></span>
+								</button>
+
+							</form>
+						</div><!-- /padding -->
+					</div><!-- /card -->
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- About Section (same as other pages) -->
+	<div class="about">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-5">
+					<div class="about_image">
+						<img src="{% static 'images/man.png' %}" alt="">
+					</div>
+				</div>
+				<div class="col-lg-4">
+					<div class="about_content">
+						<div class="logo_container about_logo">
+							<div class="logo"><a href="#"><img src="{% static 'images/logo.png' %}" alt="">travelix</a></div>
+						</div>
+						<p class="about_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus quis vulputate eros, iaculis consequat nisl. Nunc et suscipit urna.</p>
+						<ul class="about_social_list">
+							<li class="about_social_item"><a href="#"><i class="fa fa-pinterest"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-facebook-f"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-twitter"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-dribbble"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-behance"></i></a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-lg-3">
+					<div class="about_info">
+						<ul class="contact_info_list">
+							<li class="contact_info_item d-flex flex-row">
+								<div><div class="contact_info_icon"><img src="{% static 'images/placeholder.svg' %}" alt=""></div></div>
+								<div class="contact_info_text">4127 Raoul Wallenber 45b-c Gibraltar</div>
+							</li>
+							<li class="contact_info_item d-flex flex-row">
+								<div><div class="contact_info_icon"><img src="{% static 'images/phone-call.svg' %}" alt=""></div></div>
+								<div class="contact_info_text">2556-808-8613</div>
+							</li>
+							<li class="contact_info_item d-flex flex-row">
+								<div><div class="contact_info_icon"><img src="{% static 'images/message.svg' %}" alt=""></div></div>
+								<div class="contact_info_text"><a href="mailto:contactme@gmail.com">contactme@gmail.com</a></div>
+							</li>
+							<li class="contact_info_item d-flex flex-row">
+								<div><div class="contact_info_icon"><img src="{% static 'images/planet-earth.svg' %}" alt=""></div></div>
+								<div class="contact_info_text"><a href="https://colorlib.com">www.colorlib.com</a></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Footer -->
+
+	<!-- Focus style for inputs -->
+	<style>
+		input:focus { border-color: #d4a84b !important; box-shadow: 0 0 0 3px rgba(212,168,75,0.12); }
+		#avatar_wrap:hover #av_overlay { opacity: 1 !important; }
+	</style>
+
+	<script>
+	(function(){
+		var input = document.getElementById('photo_input');
+		var img   = document.getElementById('avatar_img');
+		var mimg  = document.getElementById('modal_img');
+		mimg.src  = img.src;
+		document.getElementById('avatar_wrap').addEventListener('click', function(){ input.click(); });
+		input.addEventListener('change', function(){
+			var file = input.files[0];
+			if(!file) return;
+			var r = new FileReader();
+			r.onload = function(e){ img.src = e.target.result; mimg.src = e.target.result; };
+			r.readAsDataURL(file);
+		});
+	})();
+	function openModal(){
+		document.getElementById('photo_modal').style.display='flex';
+		document.body.style.overflow='hidden';
+	}
+	function closeModal(){
+		document.getElementById('photo_modal').style.display='none';
+		document.body.style.overflow='';
+	}
+	document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeModal(); });
+	</script>
+
+{% endblock %}

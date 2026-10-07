@@ -1,0 +1,226 @@
+{% extends 'header.html' %}
+{% load static %}
+{% block content %}
+
+	<!-- Mobile Menu -->
+	<div class="menu trans_500">
+		<div class="menu_content d-flex flex-column align-items-center justify-content-center text-center">
+			<div class="menu_close_container"><div class="menu_close"></div></div>
+			<div class="logo menu_logo"><a href="#"><img src="{% static 'images/logo.png' %}" alt=""></a></div>
+			<ul>
+				<li class="menu_item"><a href="{% url 'index' %}">home</a></li>
+				<li class="menu_item"><a href="{% url 'about' %}">about us</a></li>
+				<li class="menu_item"><a href="{% url 'contact' %}">contact</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<!-- Home Banner -->
+	<div class="home">
+		<div class="home_background parallax-window" data-parallax="scroll" data-image-src="{% static 'images/contact_background.jpg' %}"></div>
+		<div class="home_content">
+			<div class="home_title">Forgot Password</div>
+		</div>
+	</div>
+
+	<!-- Form Section -->
+	<div class="contact_form_section" style="background:#f9f9f9;padding:80px 0 90px;">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-lg-5 col-md-7">
+
+					<div style="background:#fff;border-radius:14px;box-shadow:0 6px 40px rgba(0,0,0,0.09);overflow:hidden;">
+						<!-- Golden top bar -->
+						<div style="height:5px;background:linear-gradient(90deg,#c8922a,#d4a84b,#e8c87a,#d4a84b);background-size:200%;animation:shimmer 3s linear infinite;"></div>
+
+						<div style="padding:52px 52px 48px;">
+
+							<!-- Header -->
+							<div style="text-align:center;margin-bottom:36px;">
+								<div style="width:60px;height:60px;background:linear-gradient(135deg,#d4a84b,#e8c87a);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 4px 18px rgba(212,168,75,0.35);">
+									<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+										<path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+									</svg>
+								</div>
+								<h2 style="font-size:22px;font-weight:800;color:#1a1a1a;margin:0 0 6px;text-transform:uppercase;letter-spacing:3px;">Forgot Password</h2>
+								<p style="font-size:13px;color:#aaa;margin:0;">Enter your email to receive an OTP</p>
+							</div>
+
+							<!-- Messages -->
+							{% if messages %}
+								{% for message in messages %}
+								<div style="background:{% if 'error' in message.tags %}#fff5f5{% else %}#f0fff4{% endif %};color:{% if 'error' in message.tags %}#c0392b{% else %}#27ae60{% endif %};border-left:3px solid {% if 'error' in message.tags %}#e74c3c{% else %}#27ae60{% endif %};padding:13px 16px;border-radius:8px;margin-bottom:24px;font-size:13.5px;">
+									{{ message }}
+								</div>
+								{% endfor %}
+							{% endif %}
+
+							{% if msg %}
+							<div style="background:#fff5f5;color:#c0392b;border-left:3px solid #e74c3c;padding:13px 16px;border-radius:8px;margin-bottom:24px;font-size:13.5px;">
+								{{ msg }}
+							</div>
+							{% endif %}
+
+							<form action="{% url 'f_pass' %}" method="POST" id="fp_form" novalidate>
+								{% csrf_token %}
+
+								<!-- Email -->
+								<div style="margin-bottom:24px;">
+									<label class="fp-label">Email Address <span class="fp-req">*</span></label>
+									<div style="position:relative;">
+										<span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#ccc;">
+											<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+										</span>
+										<input type="email" name="email" id="fp_email" class="fp-input"
+											placeholder="your@email.com"
+											value="{{ request.POST.email|default:'' }}"
+											autocomplete="email"
+											style="padding-left:42px;">
+									</div>
+									<div class="fp-err" id="err_fp_email">⚠ Valid email address is required</div>
+								</div>
+
+								<!-- Submit -->
+								<button type="button" onclick="validateFP()" style="
+									width:100%;padding:16px;border:none;border-radius:9px;cursor:pointer;
+									background:linear-gradient(90deg,#c8922a,#d4a84b);color:#fff;
+									font-size:13px;letter-spacing:2.5px;text-transform:uppercase;
+									font-weight:800;transition:opacity .2s,transform .1s;
+									box-shadow:0 4px 18px rgba(212,168,75,0.40);"
+									onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'"
+									onmousedown="this.style.transform='scale(.99)'" onmouseup="this.style.transform='scale(1)'">
+									Send OTP &rarr;
+								</button>
+
+								<!-- Divider -->
+								<div style="margin:28px 0 22px;display:flex;align-items:center;gap:14px;">
+									<div style="flex:1;height:1px;background:#f0f0f0;"></div>
+									<span style="font-size:11px;color:#ccc;text-transform:uppercase;letter-spacing:1px;">or</span>
+									<div style="flex:1;height:1px;background:#f0f0f0;"></div>
+								</div>
+
+								<p style="font-size:13.5px;color:#888;margin:0;text-align:center;">
+									Remember your password?
+									<a href="{% url 'login' %}" style="color:#d4a84b;font-weight:700;text-decoration:none;">Login here &rarr;</a>
+								</p>
+								<p style="font-size:13.5px;color:#888;margin:10px 0 0;text-align:center;">
+									Don't have an account?
+									<a href="{% url 'signup' %}" style="color:#d4a84b;font-weight:700;text-decoration:none;">Sign up here &rarr;</a>
+								</p>
+
+							</form>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- About -->
+	<div class="about">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-5">
+					<div class="about_image"><img src="{% static 'images/man.png' %}" alt=""></div>
+				</div>
+				<div class="col-lg-4">
+					<div class="about_content">
+						<div class="logo_container about_logo">
+							<div class="logo"><a href="#"><img src="{% static 'images/logo.png' %}" alt="">travelix</a></div>
+						</div>
+						<p class="about_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus quis vulputate eros, iaculis consequat nisl. Nunc et suscipit urna.</p>
+						<ul class="about_social_list">
+							<li class="about_social_item"><a href="#"><i class="fa fa-pinterest"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-facebook-f"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-twitter"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-dribbble"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-behance"></i></a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-lg-3">
+					<div class="about_info">
+						<ul class="contact_info_list">
+							<li class="contact_info_item d-flex flex-row">
+								<div><div class="contact_info_icon"><img src="{% static 'images/placeholder.svg' %}" alt=""></div></div>
+								<div class="contact_info_text">4127 Raoul Wallenber 45b-c Gibraltar</div>
+							</li>
+							<li class="contact_info_item d-flex flex-row">
+								<div><div class="contact_info_icon"><img src="{% static 'images/phone-call.svg' %}" alt=""></div></div>
+								<div class="contact_info_text">2556-808-8613</div>
+							</li>
+							<li class="contact_info_item d-flex flex-row">
+								<div><div class="contact_info_icon"><img src="{% static 'images/message.svg' %}" alt=""></div></div>
+								<div class="contact_info_text"><a href="mailto:contactme@gmail.com?Subject=Hello" target="_top">contactme@gmail.com</a></div>
+							</li>
+							<li class="contact_info_item d-flex flex-row">
+								<div><div class="contact_info_icon"><img src="{% static 'images/planet-earth.svg' %}" alt=""></div></div>
+								<div class="contact_info_text"><a href="https://colorlib.com">www.colorlib.com</a></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Footer -->
+
+	<style>
+		@keyframes shimmer { 0%{background-position:0%} 100%{background-position:200%} }
+
+		.fp-label {
+			display:block;font-size:11px;font-weight:700;color:#999;
+			letter-spacing:.8px;text-transform:uppercase;margin-bottom:7px;
+		}
+		.fp-req { color:#d4a84b; }
+		.fp-input {
+			width:100%;padding:12px 14px;
+			border:1.5px solid #e8e8e8;border-radius:8px;
+			font-size:14px;color:#333;outline:none;
+			transition:border .2s,box-shadow .2s;
+			box-sizing:border-box;background:#fff;
+		}
+		.fp-input:focus {
+			border-color:#d4a84b;
+			box-shadow:0 0 0 3px rgba(212,168,75,0.13);
+		}
+		.fp-input.fp-error {
+			border-color:#e74c3c !important;
+			box-shadow:0 0 0 3px rgba(231,76,60,0.10) !important;
+			animation:shake .3s ease;
+		}
+		.fp-err {
+			display:none;font-size:11.5px;color:#e74c3c;
+			margin-top:5px;font-weight:600;
+		}
+		.fp-err.show { display:block; }
+		@keyframes shake {
+			0%,100%{transform:translateX(0)}
+			25%{transform:translateX(-5px)}
+			75%{transform:translateX(5px)}
+		}
+	</style>
+
+	<script>
+		document.getElementById('fp_email').addEventListener('input', function(){
+			this.classList.remove('fp-error');
+			document.getElementById('err_fp_email').classList.remove('show');
+		});
+
+		function validateFP(){
+			var email = document.getElementById('fp_email').value.trim();
+			var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+			if(!valid){
+				document.getElementById('fp_email').classList.add('fp-error');
+				document.getElementById('err_fp_email').classList.add('show');
+				document.getElementById('fp_email').focus();
+				return;
+			}
+			document.getElementById('fp_form').submit();
+		}
+	</script>
+
+{% endblock %}

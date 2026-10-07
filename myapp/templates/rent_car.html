@@ -1,0 +1,332 @@
+{% extends 'header.html' %}
+{% load static %}
+{% block content %}
+
+	<!-- Mobile Menu -->
+	<div class="menu trans_500">
+		<div class="menu_content d-flex flex-column align-items-center justify-content-center text-center">
+			<div class="menu_close_container"><div class="menu_close"></div></div>
+			<div class="logo menu_logo"><a href="#"><img src="{% static 'images/logo.png' %}" alt=""></a></div>
+			<ul>
+				<li class="menu_item"><a href="{% url 'index' %}">home</a></li>
+				<li class="menu_item"><a href="{% url 'about' %}">about us</a></li>
+				<li class="menu_item"><a href="{% url 'rent_car' %}">Rent a Car</a></li>
+				<li class="menu_item"><a href="{% url 'contact' %}">contact</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<!-- Hero Banner -->
+	<div class="home" style="height:40vh;min-height:300px;">
+		<div class="home_background parallax-window" data-parallax="scroll" data-image-src="{% static 'images/contact_background.jpg' %}"></div>
+		<div class="home_content" style="top:50%;">
+			<div class="home_title">Rent a Car</div>
+			<div style="font-size:15px;color:rgba(255,255,255,0.80);margin-top:10px;letter-spacing:1px;">Find your perfect ride for every journey</div>
+		</div>
+	</div>
+
+	<!-- Main Section -->
+	<div style="background:#f4f6f9;padding:50px 0 80px;">
+		<div class="container">
+
+			<!-- Search & Filter Card -->
+			<div style="background:#fff;border-radius:16px;box-shadow:0 4px 28px rgba(0,0,0,0.08);padding:28px 32px;margin-bottom:36px;">
+
+				<!-- Search bar -->
+				<div style="position:relative;margin-bottom:20px;">
+					<span style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#c8a84b;">
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+					</span>
+					<input type="text" id="rc_search" placeholder="Search by brand, model or city..."
+						style="width:100%;padding:14px 16px 14px 48px;border:2px solid #f0f0f0;border-radius:10px;font-size:15px;color:#333;outline:none;box-sizing:border-box;transition:border .2s;"
+						onfocus="this.style.borderColor='#d4a84b'" onblur="this.style.borderColor='#f0f0f0'"
+						oninput="filterCars()">
+				</div>
+
+				<!-- Filter dropdowns -->
+				<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+
+					<div style="flex:1;min-width:120px;">
+						<label class="rc-label">Car Type</label>
+						<div style="position:relative;">
+							<select id="rc_type" class="rc-select" onchange="filterCars()">
+								<option value="">All Types</option>
+								<option value="sedan">Sedan</option>
+								<option value="suv">SUV</option>
+								<option value="hatchback">Hatchback</option>
+								<option value="mpv">MPV / Van</option>
+								<option value="luxury">Luxury</option>
+								<option value="convertible">Convertible</option>
+								<option value="pickup">Pickup</option>
+							</select>
+							<span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:#bbb;font-size:11px;">▼</span>
+						</div>
+					</div>
+
+					<div style="flex:1;min-width:120px;">
+						<label class="rc-label">Fuel</label>
+						<div style="position:relative;">
+							<select id="rc_fuel" class="rc-select" onchange="filterCars()">
+								<option value="">All Fuels</option>
+								<option value="petrol">Petrol</option>
+								<option value="diesel">Diesel</option>
+								<option value="cng">CNG</option>
+								<option value="electric">Electric</option>
+								<option value="hybrid">Hybrid</option>
+							</select>
+							<span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:#bbb;font-size:11px;">▼</span>
+						</div>
+					</div>
+
+					<div style="flex:1;min-width:120px;">
+						<label class="rc-label">Transmission</label>
+						<div style="position:relative;">
+							<select id="rc_trans" class="rc-select" onchange="filterCars()">
+								<option value="">All</option>
+								<option value="manual">Manual</option>
+								<option value="automatic">Automatic</option>
+							</select>
+							<span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:#bbb;font-size:11px;">▼</span>
+						</div>
+					</div>
+
+					<div style="flex:1;min-width:120px;">
+						<label class="rc-label">Sort By</label>
+						<div style="position:relative;">
+							<select id="rc_sort" class="rc-select" onchange="filterCars()">
+								<option value="newest">Newest First</option>
+								<option value="price_asc">Price: Low → High</option>
+								<option value="price_desc">Price: High → Low</option>
+							</select>
+							<span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:#bbb;font-size:11px;">▼</span>
+						</div>
+					</div>
+
+					<div>
+						<label class="rc-label" style="visibility:hidden;">x</label>
+						<button onclick="clearFilters()" style="padding:11px 20px;border:1.5px solid #e8e8e8;border-radius:8px;background:#fff;font-size:12px;color:#999;cursor:pointer;font-weight:600;white-space:nowrap;transition:all .2s;" onmouseover="this.style.borderColor='#d4a84b';this.style.color='#c8922a'" onmouseout="this.style.borderColor='#e8e8e8';this.style.color='#999'">
+							✕ Clear
+						</button>
+					</div>
+
+				</div>
+			</div>
+
+			<!-- Messages -->
+			{% if messages %}
+				{% for message in messages %}
+				<div style="background:{% if 'error' in message.tags %}#fff5f5{% else %}#f0fff4{% endif %};color:{% if 'error' in message.tags %}#c0392b{% else %}#27ae60{% endif %};border-left:3px solid {% if 'error' in message.tags %}#e74c3c{% else %}#27ae60{% endif %};padding:13px 18px;border-radius:8px;margin-bottom:20px;font-size:13.5px;">
+					{{ message }}
+				</div>
+				{% endfor %}
+			{% endif %}
+
+			<!-- Results Count -->
+			<div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;">
+				<span style="font-size:14px;color:#888;">Showing</span>
+				<span id="rc_count" style="font-size:18px;font-weight:800;color:#31124b;">{{ cars|length }}</span>
+				<span style="font-size:14px;color:#888;">car{{ cars|length|pluralize }} available</span>
+			</div>
+
+			{% if cars %}
+
+			<!-- Cars Grid -->
+			<div id="cars_grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;">
+
+				{% for car in cars %}
+				<div class="rc-card"
+					data-brand="{{ car.brand|lower }}"
+					data-model="{{ car.model|lower }}"
+					data-city="{{ car.city|lower }}"
+					data-type="{{ car.car_type|lower }}"
+					data-fuel="{{ car.fuel_type|lower }}"
+					data-trans="{{ car.transmission|lower }}"
+					data-price="{{ car.price_per_day }}">
+
+					<!-- Image -->
+					<div style="position:relative;height:200px;background:#f0f0f0;overflow:hidden;border-radius:12px 12px 0 0;">
+						{% if car.main_photo %}
+						<img src="{{ car.main_photo.url }}" alt="{{ car.brand }} {{ car.model }}"
+							style="width:100%;height:100%;object-fit:cover;transition:transform .5s;">
+						{% else %}
+						<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f5f5f5;">
+							<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v4h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+						</div>
+						{% endif %}
+
+						<!-- Price Badge -->
+						<div style="position:absolute;bottom:12px;left:12px;background:linear-gradient(90deg,#c8922a,#d4a84b);color:#fff;padding:6px 14px;border-radius:20px;font-size:14px;font-weight:800;box-shadow:0 2px 12px rgba(200,146,42,0.45);">
+							₹{{ car.price_per_day }}<span style="font-size:10px;font-weight:500;opacity:.9;">/day</span>
+						</div>
+
+						<!-- Car Type Badge -->
+						<div style="position:absolute;top:12px;left:12px;background:rgba(49,18,75,0.85);color:#fff;padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;">
+							{{ car.car_type }}
+						</div>
+
+						<!-- ❤️ Single Heart Button — top right -->
+						<a href="{% if car.id in wishlist_ids %}{% url 'delete_wishlist' car.pk %}{% else %}{% url 'add_wishlist' car.pk %}{% endif %}"
+							style="position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.95);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);transition:transform .2s;text-decoration:none;"
+							onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+							{% if car.id in wishlist_ids %}
+								<!-- Red filled heart — already in wishlist -->
+								<svg width="17" height="17" viewBox="0 0 24 24" fill="#e74c3c" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+								</svg>
+							{% else %}
+								<!-- Grey outline heart — not in wishlist -->
+								<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+								</svg>
+							{% endif %}
+						</a>
+
+					</div>
+
+					<!-- Card Body -->
+					<div style="padding:16px 18px 18px;">
+
+						<!-- Name & Year -->
+						<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+							<h3 style="font-size:16px;font-weight:800;color:#1a1a1a;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:74%;">{{ car.brand }} {{ car.model }}</h3>
+							<span style="font-size:11px;color:#bbb;font-weight:600;background:#f5f5f5;padding:2px 8px;border-radius:10px;">{{ car.year }}</span>
+						</div>
+
+						<!-- City -->
+						<div style="display:flex;align-items:center;gap:4px;margin-bottom:12px;">
+							<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d4a84b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+							<span style="font-size:12px;color:#aaa;">{{ car.city }}</span>
+						</div>
+
+						<!-- Specs Row -->
+						<div style="display:grid;grid-template-columns:repeat(3,1fr);border:1px solid #f0f0f0;border-radius:8px;overflow:hidden;margin-bottom:14px;">
+							<div class="rc-spec">
+								<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c8a84b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+								{{ car.seats }} Seats
+							</div>
+							<div class="rc-spec" style="border-left:1px solid #f0f0f0;border-right:1px solid #f0f0f0;">
+								<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c8a84b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg>
+								{{ car.fuel_type|capfirst }}
+							</div>
+							<div class="rc-spec">
+								<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c8a84b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+								{{ car.transmission|capfirst }}
+							</div>
+						</div>
+
+						<!-- Book & Cart Buttons -->
+						<div style="display:flex;gap:10px;">
+							<a href="{% url 'book_car' car.pk %}" class="rc-book-btn" style="flex:1;">
+								Book Now &rarr;
+							</a>
+							<a href="{% url 'addcart' car.pk %}" class="rc-book-btn" style="width:48px;padding:13px 0;background:#fff;color:#31124b;box-shadow:none;border:1.5px solid #e8e8e8;" title="Add to Cart">
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+							</a>
+						</div>
+
+					</div>
+				</div>
+				{% endfor %}
+
+			</div>
+
+			<!-- No Filter Result -->
+			<div id="no_filter_result" style="display:none;text-align:center;padding:70px 20px;">
+				<svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#e0e0e0" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:16px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+				<p style="font-size:15px;color:#bbb;margin:0 0 10px;">No cars match your filters.</p>
+				<a href="#" onclick="clearFilters();return false;" style="font-size:13px;color:#d4a84b;font-weight:700;text-decoration:none;">✕ Clear filters</a>
+			</div>
+
+			{% else %}
+			<div style="text-align:center;padding:80px 20px;background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.05);">
+				<svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#e8e8e8" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:20px;"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v4h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+				<h3 style="font-size:18px;font-weight:800;color:#ccc;margin:0 0 8px;">No Cars Available</h3>
+				<p style="font-size:13px;color:#ddd;margin:0;">Check back later for available rental cars.</p>
+			</div>
+			{% endif %}
+
+		</div>
+	</div>
+
+	<!-- About -->
+	<div class="about">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-5"><div class="about_image"><img src="{% static 'images/man.png' %}" alt=""></div></div>
+				<div class="col-lg-4">
+					<div class="about_content">
+						<div class="logo_container about_logo"><div class="logo"><a href="#"><img src="{% static 'images/logo.png' %}" alt="">travelix</a></div></div>
+						<p class="about_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus quis vulputate eros, iaculis consequat nisl.</p>
+						<ul class="about_social_list">
+							<li class="about_social_item"><a href="#"><i class="fa fa-pinterest"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-facebook-f"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-twitter"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-dribbble"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-behance"></i></a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-lg-3">
+					<div class="about_info">
+						<ul class="contact_info_list">
+							<li class="contact_info_item d-flex flex-row"><div><div class="contact_info_icon"><img src="{% static 'images/placeholder.svg' %}" alt=""></div></div><div class="contact_info_text">4127 Raoul Wallenber 45b-c Gibraltar</div></li>
+							<li class="contact_info_item d-flex flex-row"><div><div class="contact_info_icon"><img src="{% static 'images/phone-call.svg' %}" alt=""></div></div><div class="contact_info_text">2556-808-8613</div></li>
+							<li class="contact_info_item d-flex flex-row"><div><div class="contact_info_icon"><img src="{% static 'images/message.svg' %}" alt=""></div></div><div class="contact_info_text"><a href="mailto:contactme@gmail.com">contactme@gmail.com</a></div></li>
+							<li class="contact_info_item d-flex flex-row"><div><div class="contact_info_icon"><img src="{% static 'images/planet-earth.svg' %}" alt=""></div></div><div class="contact_info_text"><a href="https://colorlib.com">www.colorlib.com</a></div></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<style>
+		.rc-label { display:block;font-size:10px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px; }
+		.rc-select { width:100%;padding:10px 32px 10px 12px;border:1.5px solid #e8e8e8;border-radius:8px;font-size:13px;color:#555;outline:none;transition:border .2s;box-sizing:border-box;background:#fff;appearance:none;cursor:pointer; }
+		.rc-select:focus { border-color:#d4a84b; box-shadow:0 0 0 3px rgba(212,168,75,0.12); }
+		.rc-card { background:#fff;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.06);overflow:hidden;transition:transform .3s,box-shadow .3s; }
+		.rc-card:hover { transform:translateY(-5px);box-shadow:0 12px 32px rgba(0,0,0,0.12); }
+		.rc-card:hover img { transform:scale(1.05); }
+		.rc-spec { display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;font-size:11px;color:#999;font-weight:600;text-transform:capitalize; }
+		.rc-book-btn { display:block;width:100%;padding:13px;text-align:center;border-radius:8px;background:linear-gradient(90deg,#c8922a,#d4a84b);color:#fff;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;box-shadow:0 4px 14px rgba(212,168,75,0.30);transition:opacity .2s; }
+		.rc-book-btn:hover { opacity:.88;color:#fff;text-decoration:none; }
+		@media(max-width:992px){ #cars_grid{ grid-template-columns:repeat(2,1fr); } }
+		@media(max-width:600px){ #cars_grid{ grid-template-columns:1fr; } }
+	</style>
+
+	<script>
+		var allCards = Array.from(document.querySelectorAll('.rc-card'));
+		function filterCars(){
+			var search = document.getElementById('rc_search').value.toLowerCase();
+			var type   = document.getElementById('rc_type').value.toLowerCase();
+			var fuel   = document.getElementById('rc_fuel').value.toLowerCase();
+			var trans  = document.getElementById('rc_trans').value.toLowerCase();
+			var sort   = document.getElementById('rc_sort').value;
+			var visible = allCards.filter(function(c){
+				return (!search || c.dataset.brand.includes(search)||c.dataset.model.includes(search)||c.dataset.city.includes(search)) &&
+					(!type  || c.dataset.type===type) &&
+					(!fuel  || c.dataset.fuel===fuel) &&
+					(!trans || c.dataset.trans===trans);
+			});
+			visible.sort(function(a,b){
+				if(sort==='price_asc')  return +a.dataset.price - +b.dataset.price;
+				if(sort==='price_desc') return +b.dataset.price - +a.dataset.price;
+				return 0;
+			});
+			var grid = document.getElementById('cars_grid');
+			allCards.forEach(function(c){ c.style.display='none'; });
+			visible.forEach(function(c){ c.style.display='block'; grid.appendChild(c); });
+			document.getElementById('rc_count').textContent = visible.length;
+			document.getElementById('no_filter_result').style.display = visible.length===0?'block':'none';
+		}
+		function clearFilters(){
+			document.getElementById('rc_search').value='';
+			document.getElementById('rc_type').value='';
+			document.getElementById('rc_fuel').value='';
+			document.getElementById('rc_trans').value='';
+			document.getElementById('rc_sort').value='newest';
+			filterCars();
+		}
+	</script>
+
+{% endblock %}

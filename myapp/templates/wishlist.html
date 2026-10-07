@@ -1,0 +1,109 @@
+{% extends 'header.html' %}
+{% load static %}
+{% block content %}
+
+	<!-- Hero Banner -->
+	<div class="home" style="height:40vh;min-height:300px;">
+		<div class="home_background parallax-window" data-parallax="scroll" data-image-src="{% static 'images/contact_background.jpg' %}"></div>
+		<div class="home_content" style="top:50%;">
+			<div class="home_title">Your Wishlist</div>
+			<div style="font-size:15px;color:rgba(255,255,255,0.80);margin-top:10px;letter-spacing:1px;">Saved cars for your next trip</div>
+		</div>
+	</div>
+
+	<!-- Main Section -->
+	<div style="background:#f4f6f9;padding:60px 0 100px;">
+		<div class="container">
+
+			<!-- Results Count -->
+			<div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;">
+				<span style="font-size:14px;color:#888;">You have</span>
+				<span style="font-size:18px;font-weight:800;color:#31124b;">{{ wishlist|length }}</span>
+				<span style="font-size:14px;color:#888;">car{{ wishlist|length|pluralize }} in your wishlist</span>
+			</div>
+
+			{% if wishlist %}
+
+			<!-- Cars Grid -->
+			<div id="cars_grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;">
+
+				{% for item in wishlist %}
+				<div class="rc-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.06);overflow:hidden;transition:transform .3s,box-shadow .3s;">
+
+					<!-- Image -->
+					<div style="position:relative;height:200px;background:#f0f0f0;overflow:hidden;border-radius:12px 12px 0 0;">
+						{% if item.car.main_photo %}
+						<img src="{{ item.car.main_photo.url }}" alt="{{ item.car.brand }} {{ item.car.model }}"
+							style="width:100%;height:100%;object-fit:cover;transition:transform .5s;">
+						{% else %}
+						<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f5f5f5;">
+							<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v4h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+						</div>
+						{% endif %}
+
+						<!-- Price Badge -->
+						<div style="position:absolute;bottom:12px;left:12px;background:linear-gradient(90deg,#c8922a,#d4a84b);color:#fff;padding:6px 14px;border-radius:20px;font-size:14px;font-weight:800;box-shadow:0 2px 12px rgba(200,146,42,0.45);">
+							₹{{ item.car.price_per_day }}<span style="font-size:10px;font-weight:500;opacity:.9;">/day</span>
+						</div>
+
+						<!-- Delete from Wishlist Button — top right -->
+						<a href="{% url 'delete_wishlist' item.car.pk %}"
+							style="position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.95);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);transition:transform .2s;text-decoration:none;"
+							onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="Remove from wishlist">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="#e74c3c" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+						</a>
+					</div>
+
+					<!-- Card Body -->
+					<div style="padding:16px 18px 18px;">
+
+						<!-- Name & Year -->
+						<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+							<h3 style="font-size:16px;font-weight:800;color:#1a1a1a;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:74%;">{{ item.car.brand }} {{ item.car.model }}</h3>
+							<span style="font-size:11px;color:#bbb;font-weight:600;background:#f5f5f5;padding:2px 8px;border-radius:10px;">{{ item.car.year }}</span>
+						</div>
+
+						<!-- City -->
+						<div style="display:flex;align-items:center;gap:4px;margin-bottom:12px;">
+							<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d4a84b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+							<span style="font-size:12px;color:#aaa;">{{ item.car.city }}</span>
+						</div>
+
+						<!-- Book & Cart Buttons -->
+						<div style="display:flex;gap:10px;">
+							<a href="{% url 'book_car' item.car.pk %}" style="flex:1;display:block;width:100%;padding:13px;text-align:center;border-radius:8px;background:linear-gradient(90deg,#c8922a,#d4a84b);color:#fff;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;box-shadow:0 4px 14px rgba(212,168,75,0.30);transition:opacity .2s;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+								Book Now &rarr;
+							</a>
+							<a href="{% url 'addcart' item.car.pk %}" style="width:48px;padding:13px 0;background:#fff;color:#31124b;box-shadow:none;border:1.5px solid #e8e8e8;text-align:center;border-radius:8px;transition:border .2s;" onmouseover="this.style.borderColor='#d4a84b'" onmouseout="this.style.borderColor='#e8e8e8'" title="Add to Cart">
+								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+							</a>
+						</div>
+
+					</div>
+				</div>
+				{% endfor %}
+
+			</div>
+
+			{% else %}
+			<div style="text-align:center;padding:80px 20px;background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.05);">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#eee" stroke-width="1.5" style="margin-bottom:16px;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+				<h3 style="font-size:18px;font-weight:800;color:#ccc;margin:0 0 8px;">Your Wishlist is Empty</h3>
+				<p style="font-size:13px;color:#ddd;margin:0;margin-bottom:16px;">Save your favorite cars here to book them later.</p>
+                <a href="{% url 'rent_car' %}" style="display:inline-block;padding:12px 24px;border-radius:8px;background:linear-gradient(90deg,#c8922a,#d4a84b);color:#fff;font-size:13px;font-weight:800;text-transform:uppercase;text-decoration:none;">Browse Cars</a>
+			</div>
+			{% endif %}
+
+		</div>
+	</div>
+
+	<style>
+		.rc-card:hover { transform:translateY(-5px) !important;box-shadow:0 12px 32px rgba(0,0,0,0.12) !important; }
+		.rc-card:hover img { transform:scale(1.05) !important; }
+		@media(max-width:992px){ #cars_grid{ grid-template-columns:repeat(2,1fr) !important; } }
+		@media(max-width:600px){ #cars_grid{ grid-template-columns:1fr !important; } }
+	</style>
+
+{% endblock %}

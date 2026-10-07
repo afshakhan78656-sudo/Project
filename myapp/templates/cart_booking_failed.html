@@ -1,0 +1,105 @@
+{% extends 'header.html' %}
+{% load static %}
+{% block content %}
+
+	<!-- Failure Banner -->
+	<div style="background:#f4f6f9;padding:120px 0 100px;text-align:center;">
+		<div class="container">
+			<div style="background:#fff;border-radius:16px;box-shadow:0 6px 40px rgba(0,0,0,0.06);display:inline-block;padding:50px 70px;max-width:650px;width:100%;text-align:left;">
+				
+				<div style="border-radius:50%;height:80px;width:80px;background:#fff5f5;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;">
+					<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fa5252" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+						<line x1="18" y1="6" x2="6" y2="18"/>
+						<line x1="6" y1="6" x2="18" y2="18"/>
+					</svg>
+				</div>
+
+				<h1 style="font-size:28px;font-weight:800;color:#c0392b;text-align:center;margin-bottom:6px;">Payment Failed</h1>
+				<p style="font-size:15px;color:#666;line-height:1.6;margin-bottom:30px;text-align:center;">
+					Your payment could not be completed. Your booking status has been marked as Pending Payment. You can retry the payment below.
+				</p>
+
+				<div style="background:#f9f9f9;padding:24px;border-radius:10px;margin-bottom:30px;font-size:14px;color:#555;">
+					{% if booking %}
+					<div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+						<span style="font-weight:700;">Booking ID:</span>
+						<span style="font-family:monospace;color:#111;">#{{ booking.id }}</span>
+					</div>
+					{% endif %}
+					<div style="display:flex;justify-content:space-between;margin-bottom:12px;">
+						<span style="font-weight:700;">Error Message:</span>
+						<span style="color:#e74c3c;font-weight:600;">{{ error_msg }}</span>
+					</div>
+					<div style="display:flex;justify-content:space-between;">
+						<span style="font-weight:700;">Amount:</span>
+						<span style="font-weight:800;color:#c8922a;font-size:16px;">₹{{ booking.grand_total }}</span>
+					</div>
+				</div>
+
+				<!-- Razorpay Form integration -->
+				<form action="{% url 'cart_booking_payment_handler' %}" method="POST" id="razorpay_retry_form">
+					{% csrf_token %}
+					<input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+					<input type="hidden" name="razorpay_order_id" id="razorpay_order_id" value="{{ payment.id }}">
+					<input type="hidden" name="razorpay_signature" id="razorpay_signature">
+
+					<div style="display:flex;gap:15px;">
+						<button type="button" onclick="payWithRazorpayRetry()" class="btn-fail-primary" style="flex:1;">
+							Retry Payment
+						</button>
+						<a href="{% url 'scart' %}" class="btn-fail-secondary" style="flex:1;text-decoration:none;text-align:center;">
+							Back to Cart
+						</a>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+
+	<style>
+		.btn-fail-primary {
+			width:100%;padding:14px;background:linear-gradient(90deg,#c8922a,#d4a84b);color:#fff;
+			border:none;border-radius:8px;font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+			cursor:pointer;box-shadow:0 4px 18px rgba(212,168,75,0.35);
+		}
+		.btn-fail-secondary {
+			display:block;padding:14px;background:#f5f5f5;color:#666;
+			border-radius:8px;font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+			border:1px solid #ddd;
+		}
+		.btn-fail-primary:hover { opacity:.9; }
+		.btn-fail-secondary:hover { background:#eee; }
+	</style>
+
+	<!-- Razorpay SDK -->
+	<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+	<script>
+		var options = {
+			"key": "{{ razorpay_key }}",
+			"amount": "{{ payment.amount }}",
+			"currency": "INR",
+			"name": "Travelix Car Rental",
+			"description": "Payment for Cart Order Summary",
+			"order_id": "{{ payment.id }}",
+			"handler": function (response){
+				document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+				document.getElementById('razorpay_signature').value = response.razorpay_signature;
+				document.getElementById('razorpay_retry_form').submit();
+			},
+			"theme": {
+				"color": "#fa5252"
+			}
+		};
+		var rzp1 = new Razorpay(options);
+
+		rzp1.on('payment.failed', function (response){
+			alert("Payment Failed Again: " + response.error.description);
+		});
+
+		function payWithRazorpayRetry() {
+			rzp1.open();
+		}
+	</script>
+
+{% endblock %}

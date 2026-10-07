@@ -1,0 +1,197 @@
+{% extends 'header.html' %}
+{% load static %}
+{% block content %}
+
+	<div class="menu trans_500">
+		<div class="menu_content d-flex flex-column align-items-center justify-content-center text-center">
+			<div class="menu_close_container"><div class="menu_close"></div></div>
+			<div class="logo menu_logo"><a href="#"><img src="{% static 'images/logo.png' %}" alt=""></a></div>
+			<ul>
+				<li class="menu_item"><a href="{% url 'index' %}">home</a></li>
+				<li class="menu_item"><a href="{% url 'about' %}">about us</a></li>
+				<li class="menu_item"><a href="{% url 'rent_car' %}">Rent a Car</a></li>
+				<li class="menu_item"><a href="{% url 'contact' %}">contact</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="home" style="height:40vh;min-height:300px;">
+		<div class="home_background parallax-window" data-parallax="scroll" data-image-src="{% static 'images/contact_background.jpg' %}"></div>
+		<div class="home_content" style="top:50%;">
+			<div class="home_title">Booking Summary</div>
+			<div style="font-size:15px;color:rgba(255,255,255,0.80);margin-top:10px;letter-spacing:1px;">Confirm your selection and details</div>
+		</div>
+	</div>
+
+	<div style="background:#f4f6f9;padding:60px 0 90px;">
+		<div class="container">
+			<div class="row">
+				
+				<!-- Left Column: Booking Info & Cars Summary -->
+				<div class="col-lg-8" style="margin-bottom:30px;">
+					
+					<!-- Booking Details Card -->
+					<div style="background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,0.05);padding:30px;margin-bottom:24px;">
+						<h3 style="font-size:18px;font-weight:800;color:#31124b;margin-bottom:20px;border-bottom:1px solid #f0f0f0;padding-bottom:10px;">
+							Contact & Scheduling Info
+						</h3>
+						<div class="row">
+							<div class="col-md-6" style="margin-bottom:15px;">
+								<span class="detail-label">Full Name</span>
+								<span class="detail-val">{{ booking_data.full_name }}</span>
+							</div>
+							<div class="col-md-6" style="margin-bottom:15px;">
+								<span class="detail-label">Email</span>
+								<span class="detail-val">{{ booking_data.email }}</span>
+							</div>
+							<div class="col-md-6" style="margin-bottom:15px;">
+								<span class="detail-label">Mobile</span>
+								<span class="detail-val">{{ booking_data.mobile }}</span>
+							</div>
+							<div class="col-md-6" style="margin-bottom:15px;">
+								<span class="detail-label">Special Note</span>
+								<span class="detail-val">{{ booking_data.note|default:"None" }}</span>
+							</div>
+						</div>
+						<div class="row" style="border-top:1px solid #f9f9f9;padding-top:15px;margin-top:5px;">
+							<div class="col-md-6" style="margin-bottom:10px;">
+								<span class="detail-label">Pickup Date</span>
+								<span class="detail-val">{{ booking_data.pickup_date }}</span>
+							</div>
+							<div class="col-md-6" style="margin-bottom:10px;">
+								<span class="detail-label">Return Date</span>
+								<span class="detail-val">{{ booking_data.return_date }}</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- Cars List -->
+					<div style="background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,0.05);padding:30px;">
+						<h3 style="font-size:18px;font-weight:800;color:#31124b;margin-bottom:20px;border-bottom:1px solid #f0f0f0;padding-bottom:10px;">
+							Selected Cars
+						</h3>
+
+						{% for item in items_summary %}
+						<div style="display:flex;gap:20px;padding:20px 0;border-bottom:1px solid #f9f9f9;align-items:center;flex-wrap:wrap;">
+							<div style="width:130px;height:90px;border-radius:8px;overflow:hidden;background:#f5f5f5;flex-shrink:0;">
+								{% if item.car.main_photo %}
+								<img src="{{ item.car.main_photo.url }}" style="width:100%;height:100%;object-fit:cover;" alt="{{ item.car.brand }}">
+								{% else %}
+								<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+									<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.5"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v4h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+								</div>
+								{% endif %}
+							</div>
+							<div style="flex:1;min-width:0;">
+								<h4 style="font-size:17px;font-weight:800;color:#1a1a1a;margin:0 0 4px;">{{ item.car.brand }} {{ item.car.model }}</h4>
+								<div style="display:flex;gap:10px;font-size:12px;color:#aaa;margin-bottom:4px;">
+									<span>{{ item.car.year }}</span>
+									<span>•</span>
+									<span>{{ item.car.city }}</span>
+								</div>
+								<div style="font-size:13px;color:#888;">Duration: <strong>{{ booking_data.total_days }} day{{ booking_data.total_days|pluralize }}</strong></div>
+							</div>
+							<div style="text-align:right;flex-shrink:0;">
+								<div style="font-size:18px;font-weight:800;color:#c8922a;margin-bottom:2px;">₹{{ item.total_price }}</div>
+								<div style="font-size:11px;color:#aaa;">₹{{ item.price_per_day }}/day</div>
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+
+				</div>
+
+				<!-- Right Column: Grand Summary Card -->
+				<div class="col-lg-4">
+					<div style="background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,0.05);padding:30px;position:sticky;top:24px;">
+						<h3 style="font-size:18px;font-weight:800;color:#31124b;margin-bottom:20px;border-bottom:1px solid #f0f0f0;padding-bottom:10px;">
+							Fare Summary
+						</h3>
+
+						<div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px;color:#777;">
+							<span>Number of Cars</span>
+							<span style="font-weight:700;color:#333;">{{ items_summary|length }}</span>
+						</div>
+
+						<div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px;color:#777;">
+							<span>Rental Period</span>
+							<span style="font-weight:700;color:#333;">{{ booking_data.total_days }} Day{{ booking_data.total_days|pluralize }}</span>
+						</div>
+
+						<div style="border-top:1px dashed #e8e8e8;margin:14px 0;"></div>
+
+						<div style="display:flex;justify-content:space-between;margin-bottom:24px;">
+							<span style="font-size:16px;font-weight:800;color:#1a1a1a;">Grand Total</span>
+							<span style="font-size:22px;font-weight:800;color:#c8922a;">₹{{ grand_total }}</span>
+						</div>
+
+						<!-- Razorpay Form integration -->
+						<form action="{% url 'cart_booking_payment_handler' %}" method="POST" id="razorpay_form">
+							{% csrf_token %}
+							<input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+							<input type="hidden" name="razorpay_order_id" id="razorpay_order_id" value="{{ payment.id }}">
+							<input type="hidden" name="razorpay_signature" id="razorpay_signature">
+
+							<button type="button" onclick="payWithRazorpay()" class="btn-pay">
+								Pay Now
+							</button>
+						</form>
+
+						<a href="{% url 'cart_booking_details' %}" style="display:block;text-align:center;margin-top:14px;font-size:13px;color:#d4a84b;font-weight:600;text-decoration:none;">
+							Edit Details
+						</a>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<style>
+		.detail-label {
+			display:block;font-size:10px;font-weight:700;color:#bbb;
+			letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px;
+		}
+		.detail-val {
+			display:block;font-size:14px;color:#333;font-weight:600;
+		}
+		.btn-pay {
+			width:100%;padding:15px;background:linear-gradient(90deg,#c8922a,#d4a84b);color:#fff;
+			border:none;border-radius:9px;font-size:13px;font-weight:800;
+			letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;
+			box-shadow:0 4px 18px rgba(212,168,75,0.35);transition:opacity .2s;
+		}
+		.btn-pay:hover { opacity:.9; }
+	</style>
+
+	<!-- Razorpay SDK -->
+	<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+	<script>
+		var options = {
+			"key": "{{ razorpay_key }}",
+			"amount": "{{ payment.amount }}",
+			"currency": "INR",
+			"name": "Travelix Car Rental",
+			"description": "Payment for Cart Order Summary",
+			"order_id": "{{ payment.id }}",
+			"handler": function (response){
+				document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+				document.getElementById('razorpay_signature').value = response.razorpay_signature;
+				document.getElementById('razorpay_form').submit();
+			},
+			"theme": {
+				"color": "#d4a84b"
+			}
+		};
+		var rzp1 = new Razorpay(options);
+
+		rzp1.on('payment.failed', function (response){
+			window.location.href = "{% url 'cart_booking_failed' %}?booking_id={{ booking.id }}&error=" + encodeURIComponent(response.error.description);
+		});
+
+		function payWithRazorpay() {
+			rzp1.open();
+		}
+	</script>
+
+{% endblock %}

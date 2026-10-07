@@ -1,0 +1,359 @@
+{% extends 'header.html' %}
+{% load static %}
+{% block content %}
+
+	<div class="menu trans_500">
+		<div class="menu_content d-flex flex-column align-items-center justify-content-center text-center">
+			<div class="menu_close_container"><div class="menu_close"></div></div>
+			<div class="logo menu_logo"><a href="#"><img src="{% static 'images/logo.png' %}" alt=""></a></div>
+			<ul>
+				<li class="menu_item"><a href="{% url 'index' %}">home</a></li>
+				<li class="menu_item"><a href="{% url 'about' %}">about us</a></li>
+				<li class="menu_item"><a href="{% url 'rent_car' %}">Rent a Car</a></li>
+				<li class="menu_item"><a href="{% url 'contact' %}">contact</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="home" style="height:40vh;min-height:300px;">
+		<div class="home_background parallax-window" data-parallax="scroll" data-image-src="{% static 'images/contact_background.jpg' %}"></div>
+		<div class="home_content" style="top:50%;">
+			<div class="home_title">Book Your Car</div>
+			<div style="font-size:15px;color:rgba(255,255,255,0.80);margin-top:10px;letter-spacing:1px;">{{ car.brand }} {{ car.model }} — ₹{{ car.price_per_day }}/day</div>
+		</div>
+	</div>
+
+	<div style="background:#f4f6f9;padding:50px 0 80px;">
+		<div class="container">
+
+			{% if messages %}
+				{% for message in messages %}
+				<div style="background:{% if 'error' in message.tags %}#fff5f5{% else %}#f0fff4{% endif %};color:{% if 'error' in message.tags %}#c0392b{% else %}#27ae60{% endif %};border-left:3px solid {% if 'error' in message.tags %}#e74c3c{% else %}#27ae60{% endif %};padding:13px 18px;border-radius:8px;margin-bottom:24px;font-size:13.5px;">
+					{{ message }}
+				</div>
+				{% endfor %}
+			{% endif %}
+
+			<div style="display:grid;grid-template-columns:1fr 38%;gap:24px;align-items:start;">
+
+				<!-- LEFT: Car Details -->
+				<div style="background:#fff;border-radius:14px;box-shadow:0 4px 28px rgba(0,0,0,0.08);overflow:hidden;">
+
+					<div style="height:280px;background:#f0f0f0;overflow:hidden;position:relative;">
+						{% if car.main_photo %}
+						<img src="{{ car.main_photo.url }}" alt="{{ car.brand }} {{ car.model }}" style="width:100%;height:100%;object-fit:cover;">
+						{% else %}
+						<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+							<svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.2"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v4h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+						</div>
+						{% endif %}
+						<div style="position:absolute;top:14px;left:14px;background:rgba(49,18,75,0.85);color:#fff;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;">{{ car.car_type }}</div>
+						<div style="position:absolute;bottom:14px;right:14px;background:linear-gradient(90deg,#c8922a,#d4a84b);color:#fff;padding:7px 16px;border-radius:20px;font-size:15px;font-weight:800;box-shadow:0 2px 12px rgba(200,146,42,0.45);">₹{{ car.price_per_day }}<span style="font-size:10px;font-weight:500;opacity:.9;">/day</span></div>
+					</div>
+
+					<div style="padding:26px 30px 30px;">
+
+						<h2 style="font-size:24px;font-weight:800;color:#1a1a1a;margin:0 0 6px;">{{ car.brand }} {{ car.model }}</h2>
+						<div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
+							<span style="font-size:12px;color:#bbb;background:#f5f5f5;padding:2px 10px;border-radius:10px;font-weight:600;">{{ car.year }}</span>
+							<span style="color:#ddd;">•</span>
+							<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d4a84b" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+							<span style="font-size:13px;color:#aaa;">{{ car.city }}</span>
+						</div>
+
+						<div style="display:grid;grid-template-columns:repeat(3,1fr);border:1px solid #f0f0f0;border-radius:10px;overflow:hidden;margin-bottom:18px;">
+							<div class="bk-spec">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c8a84b" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+								{{ car.seats }} Seats
+							</div>
+							<div class="bk-spec" style="border-left:1px solid #f0f0f0;border-right:1px solid #f0f0f0;">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c8a84b" stroke-width="2"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg>
+								{{ car.fuel_type|capfirst }}
+							</div>
+							<div class="bk-spec">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c8a84b" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+								{{ car.transmission|capfirst }}
+							</div>
+						</div>
+
+						<div style="display:flex;align-items:flex-start;gap:8px;padding:12px 14px;background:#f9f9f9;border-radius:8px;margin-bottom:24px;">
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d4a84b" stroke-width="2.5" style="flex-shrink:0;margin-top:2px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+							<span style="font-size:13px;color:#666;">{{ car.pickup_address }}</span>
+						</div>
+
+						<!-- Features -->
+						<div style="font-size:10.5px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#c8a84b;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+							Car Features <div style="flex:1;height:1px;background:#f0f0f0;"></div>
+						</div>
+
+						<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+
+							<div class="ft-item">
+								<span class="ft-icon {% if car.has_ac %}ft-yes{% else %}ft-no{% endif %}">{% if car.has_ac %}✔{% else %}✖{% endif %}</span>
+								<span class="ft-name">Air Conditioning</span>
+							</div>
+							<div class="ft-item">
+								<span class="ft-icon {% if car.has_gps %}ft-yes{% else %}ft-no{% endif %}">{% if car.has_gps %}✔{% else %}✖{% endif %}</span>
+								<span class="ft-name">GPS Navigation</span>
+							</div>
+							<div class="ft-item">
+								<span class="ft-icon {% if car.has_music %}ft-yes{% else %}ft-no{% endif %}">{% if car.has_music %}✔{% else %}✖{% endif %}</span>
+								<span class="ft-name">Music System</span>
+							</div>
+							<div class="ft-item">
+								<span class="ft-icon {% if car.has_bluetooth %}ft-yes{% else %}ft-no{% endif %}">{% if car.has_bluetooth %}✔{% else %}✖{% endif %}</span>
+								<span class="ft-name">Bluetooth</span>
+							</div>
+							<div class="ft-item">
+								<span class="ft-icon {% if car.has_usb %}ft-yes{% else %}ft-no{% endif %}">{% if car.has_usb %}✔{% else %}✖{% endif %}</span>
+								<span class="ft-name">USB Charging</span>
+							</div>
+							<div class="ft-item">
+								<span class="ft-icon {% if car.has_sunroof %}ft-yes{% else %}ft-no{% endif %}">{% if car.has_sunroof %}✔{% else %}✖{% endif %}</span>
+								<span class="ft-name">Sunroof</span>
+							</div>
+							<div class="ft-item">
+								<span class="ft-icon {% if car.has_rear_camera %}ft-yes{% else %}ft-no{% endif %}">{% if car.has_rear_camera %}✔{% else %}✖{% endif %}</span>
+								<span class="ft-name">Rear Camera</span>
+							</div>
+							<div class="ft-item">
+								<span class="ft-icon {% if car.has_airbags %}ft-yes{% else %}ft-no{% endif %}">{% if car.has_airbags %}✔{% else %}✖{% endif %}</span>
+								<span class="ft-name">Airbags</span>
+							</div>
+							<div class="ft-item">
+								<span class="ft-icon {% if car.has_abs %}ft-yes{% else %}ft-no{% endif %}">{% if car.has_abs %}✔{% else %}✖{% endif %}</span>
+								<span class="ft-name">ABS Brakes</span>
+							</div>
+							<div class="ft-item">
+								<span class="ft-icon {% if car.has_cruise %}ft-yes{% else %}ft-no{% endif %}">{% if car.has_cruise %}✔{% else %}✖{% endif %}</span>
+								<span class="ft-name">Cruise Control</span>
+							</div>
+							<div class="ft-item">
+								<span class="ft-icon {% if car.has_power_windows %}ft-yes{% else %}ft-no{% endif %}">{% if car.has_power_windows %}✔{% else %}✖{% endif %}</span>
+								<span class="ft-name">Power Windows</span>
+							</div>
+							<div class="ft-item">
+								<span class="ft-icon {% if car.has_central_lock %}ft-yes{% else %}ft-no{% endif %}">{% if car.has_central_lock %}✔{% else %}✖{% endif %}</span>
+								<span class="ft-name">Central Lock</span>
+							</div>
+							<div class="ft-item">
+								<span class="ft-icon {% if car.has_parking_sensor %}ft-yes{% else %}ft-no{% endif %}">{% if car.has_parking_sensor %}✔{% else %}✖{% endif %}</span>
+								<span class="ft-name">Parking Sensor</span>
+							</div>
+							<div class="ft-item">
+								<span class="ft-icon {% if car.has_spare_tyre %}ft-yes{% else %}ft-no{% endif %}">{% if car.has_spare_tyre %}✔{% else %}✖{% endif %}</span>
+								<span class="ft-name">Spare Tyre</span>
+							</div>
+							<div class="ft-item">
+								<span class="ft-icon {% if car.has_first_aid %}ft-yes{% else %}ft-no{% endif %}">{% if car.has_first_aid %}✔{% else %}✖{% endif %}</span>
+								<span class="ft-name">First Aid Kit</span>
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+				<!-- RIGHT: Booking Form -->
+				<div style="background:#fff;border-radius:14px;box-shadow:0 4px 28px rgba(0,0,0,0.08);overflow:hidden;position:sticky;top:20px;">
+					<div style="height:5px;background:linear-gradient(90deg,#c8922a,#d4a84b,#e8c87a,#d4a84b);background-size:200%;animation:shimmer 3s linear infinite;"></div>
+					<div style="padding:26px 24px 28px;">
+
+						<div style="margin-bottom:20px;">
+							<h2 style="font-size:17px;font-weight:800;color:#1a1a1a;margin:0 0 4px;text-transform:uppercase;letter-spacing:2px;">Booking</h2>
+							<p style="font-size:12px;color:#aaa;margin:0;">Fill details to confirm</p>
+						</div>
+
+						<form action="{% url 'book_car' car.id %}" method="POST" id="book_form" novalidate>
+							{% csrf_token %}
+
+							<div style="margin-bottom:13px;">
+								<label class="bk-label">Full Name <span class="bk-req">*</span></label>
+								<input type="text" name="full_name" id="bk_name" class="bk-input" placeholder="Your full name" value="{{ request.session.username|default:'' }}" required>
+								<div class="bk-err" id="err_bk_name">⚠ Name is required</div>
+							</div>
+
+							<div style="margin-bottom:13px;">
+								<label class="bk-label">Email <span class="bk-req">*</span></label>
+								<input type="email" name="email" id="bk_email" class="bk-input" placeholder="your@email.com" value="{{ request.session.email|default:'' }}" required>
+								<div class="bk-err" id="err_bk_email">⚠ Valid email required</div>
+							</div>
+
+							<div style="margin-bottom:13px;">
+								<label class="bk-label">Mobile <span class="bk-req">*</span></label>
+								<input type="tel" name="mobile" id="bk_mobile" class="bk-input" placeholder="9876543210" required>
+								<div class="bk-err" id="err_bk_mobile">⚠ Mobile is required</div>
+							</div>
+
+							<div style="margin-bottom:13px;">
+								<label class="bk-label">Pickup Date <span class="bk-req">*</span></label>
+								<input type="date" name="pickup_date" id="bk_pickup" class="bk-input" required>
+								<div class="bk-err" id="err_bk_pickup">⚠ Pickup date required</div>
+							</div>
+
+							<div style="margin-bottom:13px;">
+								<label class="bk-label">Return Date <span class="bk-req">*</span></label>
+								<input type="date" name="return_date" id="bk_return" class="bk-input" required>
+								<div class="bk-err" id="err_bk_return">⚠ Return date required</div>
+							</div>
+
+							<div style="background:#fffbf0;border:1.5px solid #f0dba8;border-radius:10px;padding:13px 15px;margin-bottom:14px;">
+								<div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+									<span style="font-size:12px;color:#999;">Price/day</span>
+									<span style="font-size:12px;font-weight:700;color:#555;">₹{{ car.price_per_day }}</span>
+								</div>
+								<div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+									<span style="font-size:12px;color:#999;">Total days</span>
+									<span id="total_days" style="font-size:12px;font-weight:700;color:#555;">—</span>
+								</div>
+								<div style="border-top:1px solid #f0dba8;margin:8px 0;"></div>
+								<div style="display:flex;justify-content:space-between;">
+									<span style="font-size:14px;font-weight:800;color:#1a1a1a;">Total</span>
+									<span id="total_price" style="font-size:16px;font-weight:800;color:#c8922a;">₹—</span>
+								</div>
+							</div>
+
+							<div style="margin-bottom:20px;">
+								<label class="bk-label">Note <span style="font-size:10px;color:#bbb;font-weight:400;text-transform:none;">(optional)</span></label>
+								<textarea name="note" class="bk-input" rows="2" placeholder="Any special request..." style="resize:none;padding-top:10px;"></textarea>
+							</div>
+
+							<button type="button" onclick="validateBooking()" style="width:100%;padding:14px;border:none;border-radius:9px;cursor:pointer;background:linear-gradient(90deg,#c8922a,#d4a84b);color:#fff;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:800;box-shadow:0 4px 18px rgba(212,168,75,0.40);transition:opacity .2s;"
+								onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'">
+								Confirm Booking &rarr;
+							</button>
+
+						</form>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<!-- About -->
+	<div class="about">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-5"><div class="about_image"><img src="{% static 'images/man.png' %}" alt=""></div></div>
+				<div class="col-lg-4">
+					<div class="about_content">
+						<div class="logo_container about_logo"><div class="logo"><a href="#"><img src="{% static 'images/logo.png' %}" alt="">travelix</a></div></div>
+						<p class="about_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+						<ul class="about_social_list">
+							<li class="about_social_item"><a href="#"><i class="fa fa-pinterest"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-facebook-f"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-twitter"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-dribbble"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-behance"></i></a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-lg-3">
+					<div class="about_info">
+						<ul class="contact_info_list">
+							<li class="contact_info_item d-flex flex-row"><div><div class="contact_info_icon"><img src="{% static 'images/placeholder.svg' %}" alt=""></div></div><div class="contact_info_text">4127 Raoul Wallenber 45b-c Gibraltar</div></li>
+							<li class="contact_info_item d-flex flex-row"><div><div class="contact_info_icon"><img src="{% static 'images/phone-call.svg' %}" alt=""></div></div><div class="contact_info_text">2556-808-8613</div></li>
+							<li class="contact_info_item d-flex flex-row"><div><div class="contact_info_icon"><img src="{% static 'images/message.svg' %}" alt=""></div></div><div class="contact_info_text"><a href="mailto:contactme@gmail.com">contactme@gmail.com</a></div></li>
+							<li class="contact_info_item d-flex flex-row"><div><div class="contact_info_icon"><img src="{% static 'images/planet-earth.svg' %}" alt=""></div></div><div class="contact_info_text"><a href="https://colorlib.com">www.colorlib.com</a></div></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<style>
+		@keyframes shimmer { 0%{background-position:0%} 100%{background-position:200%} }
+
+		.bk-label { display:block;font-size:10px;font-weight:700;color:#aaa;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px; }
+		.bk-req   { color:#d4a84b; }
+		.bk-input { width:100%;padding:10px 12px;border:1.5px solid #e8e8e8;border-radius:8px;font-size:13px;color:#333;outline:none;transition:border .2s,box-shadow .2s;box-sizing:border-box;background:#fff; }
+		.bk-input:focus { border-color:#d4a84b;box-shadow:0 0 0 3px rgba(212,168,75,0.13); }
+		.bk-input.bk-error { border-color:#e74c3c !important;box-shadow:0 0 0 3px rgba(231,76,60,0.10) !important; }
+		.bk-err  { display:none;font-size:11px;color:#e74c3c;margin-top:4px;font-weight:600; }
+		.bk-err.show { display:block; }
+
+		.bk-spec { display:flex;flex-direction:column;align-items:center;gap:6px;padding:13px 8px;font-size:12px;color:#999;font-weight:600;text-transform:capitalize; }
+
+		/* Feature row — no background at all */
+		.ft-item {
+			display:flex;align-items:center;gap:9px;
+			padding:6px 0;
+			font-size:12.5px;font-weight:500;color:#555;
+		}
+		/* Green ✔ circle */
+		.ft-icon.ft-yes {
+			width:20px;height:20px;border-radius:50%;flex-shrink:0;
+			background:#27ae60;color:#fff;
+			display:inline-flex;align-items:center;justify-content:center;
+			font-size:11px;font-weight:800;
+		}
+		/* Red ✖ circle */
+		.ft-icon.ft-no {
+			width:20px;height:20px;border-radius:50%;flex-shrink:0;
+			background:#e74c3c;color:#fff;
+			display:inline-flex;align-items:center;justify-content:center;
+			font-size:11px;font-weight:800;
+		}
+		.ft-name { font-size:12.5px;color:#555;font-weight:500; }
+
+		@media(max-width:900px){
+			div[style*="grid-template-columns:1fr 38%"] { grid-template-columns:1fr !important; }
+		}
+	</style>
+
+	<script>
+		var pricePerDay = {{ car.price_per_day }};
+		var today = new Date().toISOString().split('T')[0];
+		document.getElementById('bk_pickup').min = today;
+		document.getElementById('bk_return').min = today;
+
+		document.getElementById('bk_pickup').addEventListener('change', calcTotal);
+		document.getElementById('bk_return').addEventListener('change', calcTotal);
+
+		function calcTotal(){
+			var p = document.getElementById('bk_pickup').value;
+			var r = document.getElementById('bk_return').value;
+			if(p && r){
+				var days = Math.ceil((new Date(r)-new Date(p))/(1000*60*60*24));
+				if(days > 0){
+					document.getElementById('total_days').textContent = days+' day'+(days>1?'s':'');
+					document.getElementById('total_price').textContent = '₹'+(days*pricePerDay).toLocaleString('en-IN');
+					document.getElementById('bk_return').min = p;
+				} else {
+					document.getElementById('total_days').textContent = '—';
+					document.getElementById('total_price').textContent = '₹—';
+				}
+			}
+		}
+
+		document.querySelectorAll('.bk-input').forEach(function(el){
+			el.addEventListener('input',  function(){ el.classList.remove('bk-error'); var e=document.getElementById('err_'+el.id); if(e) e.classList.remove('show'); });
+			el.addEventListener('change', function(){ el.classList.remove('bk-error'); var e=document.getElementById('err_'+el.id); if(e) e.classList.remove('show'); });
+		});
+
+		function validateBooking(){
+			var ok = true;
+			function check(id,cond){
+				var el=document.getElementById(id),er=document.getElementById('err_'+id);
+				if(!el) return;
+				if(cond){ el.classList.add('bk-error'); if(er) er.classList.add('show'); if(ok) el.focus(); ok=false; }
+				else { el.classList.remove('bk-error'); if(er) er.classList.remove('show'); }
+			}
+			check('bk_name',   !document.getElementById('bk_name').value.trim());
+			check('bk_email',  !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('bk_email').value.trim()));
+			check('bk_mobile', !document.getElementById('bk_mobile').value.trim());
+			check('bk_pickup', !document.getElementById('bk_pickup').value);
+			check('bk_return', !document.getElementById('bk_return').value);
+			var p=document.getElementById('bk_pickup').value, r=document.getElementById('bk_return').value;
+			if(p && r && new Date(r)<=new Date(p)){
+				var er=document.getElementById('err_bk_return');
+				er.textContent='⚠ Return must be after pickup';
+				document.getElementById('bk_return').classList.add('bk-error');
+				er.classList.add('show'); ok=false;
+			}
+			if(ok) document.getElementById('book_form').submit();
+		}
+	</script>
+
+{% endblock %}

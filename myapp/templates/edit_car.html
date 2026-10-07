@@ -1,0 +1,520 @@
+{% extends 'header.html' %}
+{% load static %}
+{% block content %}
+
+	<!-- Mobile Menu -->
+	<div class="menu trans_500">
+		<div class="menu_content d-flex flex-column align-items-center justify-content-center text-center">
+			<div class="menu_close_container"><div class="menu_close"></div></div>
+			<div class="logo menu_logo"><a href="#"><img src="{% static 'images/logo.png' %}" alt=""></a></div>
+			<ul>
+				<li class="menu_item"><a href="{% url 'index' %}">home</a></li>
+				<li class="menu_item"><a href="{% url 'add_car' %}">Add-Car</a></li>
+				<li class="menu_item"><a href="{% url 'index' %}">View-Cars</a></li>
+				<li class="menu_item"><a href="{% url 'contact' %}">contact</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<!-- Home Banner -->
+	<div class="home" style="height:40vh;min-height:300px;">
+		<div class="home_background parallax-window" data-parallax="scroll" data-image-src="{% static 'images/contact_background.jpg' %}"></div>
+		<div class="home_content" style="top:50%;">
+			<div class="home_title">Add Rental Car</div>
+		</div>
+	</div>
+
+	<!-- Add Car Form -->
+	<div class="contact_form_section" style="background:#f9f9f9;padding:70px 0 80px;">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-lg-7 col-md-10">
+
+					<div style="background:#fff;border-radius:14px;box-shadow:0 6px 40px rgba(0,0,0,0.09);overflow:hidden;">
+						<!-- Golden top bar -->
+						<div style="height:5px;background:linear-gradient(90deg,#c8922a,#d4a84b,#e8c87a,#d4a84b);background-size:200%;animation:shimmer 3s linear infinite;"></div>
+
+						<div style="padding:50px 56px 54px;">
+
+							<!-- Header -->
+							<div style="text-align:center;margin-bottom:38px;">
+								<div style="width:56px;height:56px;background:linear-gradient(135deg,#d4a84b,#e8c87a);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 4px 16px rgba(212,168,75,0.35);">
+									<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<rect x="1" y="3" width="15" height="13" rx="2"/>
+										<path d="M16 8h4l3 3v4h-7V8z"/>
+										<circle cx="5.5" cy="18.5" r="2.5"/>
+										<circle cx="18.5" cy="18.5" r="2.5"/>
+									</svg>
+								</div>
+								<h2 style="font-size:22px;font-weight:800;color:#1a1a1a;margin:0 0 6px;text-transform:uppercase;letter-spacing:3px;">Edit Your Car</h2>
+								<p style="font-size:13px;color:#aaa;margin:0;">Fill in the details to Edit your rental car</p>
+							</div>
+
+							<!-- Messages -->
+							{% if messages %}{% for message in messages %}
+							<div style="background:{% if 'error' in message.tags %}#fff5f5{% else %}#f0fff4{% endif %};color:{% if 'error' in message.tags %}#c0392b{% else %}#27ae60{% endif %};border-left:3px solid {% if 'error' in message.tags %}#e74c3c{% else %}#27ae60{% endif %};padding:12px 16px;border-radius:8px;margin-bottom:24px;font-size:13.5px;">
+								{{ message }}
+							</div>
+							{% endfor %}{% endif %}
+							{% if msg %}
+							<div style="background:#fff5f5;color:#c0392b;border-left:3px solid #e74c3c;padding:12px 16px;border-radius:8px;margin-bottom:24px;font-size:13.5px;">{{ msg }}</div>
+							{% endif %}
+
+							<form action="{% url 'edit_car' car.pk%}" method="POST" enctype="multipart/form-data" id="add_car_form" novalidate>
+								{% csrf_token %}
+
+								<!-- Section: Car Information -->
+								<div class="ac-section-label">
+									<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c8a84b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v4h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+									Car Information
+								</div>
+
+								<div style="display:flex;gap:16px;margin-bottom:20px;">
+									<div style="flex:1;">
+										<label class="ac-label">Brand / Make <span class="ac-req">*</span></label>
+										<input type="text" name="brand" id="ac_brand" class="ac-input" placeholder="e.g. Toyota, Honda" value={{car.brand}} required>
+										<div class="ac-err" id="err_ac_brand">&#9888; Brand is required</div>
+									</div>
+									<div style="flex:1;">
+										<label class="ac-label">Model <span class="ac-req">*</span></label>
+										<input type="text" name="model" id="ac_model" class="ac-input" placeholder="e.g. Innova, City" value={{car.model}} required>
+										<div class="ac-err" id="err_ac_model">&#9888; Model is required</div>
+									</div>
+								</div>
+
+								<div style="display:flex;gap:16px;margin-bottom:20px;">
+									<div style="flex:1;">
+										<label class="ac-label">Year <span class="ac-req">*</span></label>
+										<input type="number" name="year" id="ac_year" class="ac-input" placeholder="e.g. 2022" min="2000" max="2026" value={{car.year}} required>
+										<div class="ac-err" id="err_ac_year">&#9888; Valid year is required</div>
+									</div>
+									<div style="flex:1;">
+										<label class="ac-label">Color</label>
+										<input type="text" name="color" class="ac-input" placeholder="e.g. White, Black"  value={{car.color}}>
+									</div>
+								</div>
+
+								<div style="display:flex;gap:16px;margin-bottom:20px;">
+									<div style="flex:1;">
+										<label style="display:block;font-size:11px;font-weight:600;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;">
+										 Number Plate
+										<span style="font-size:10px;color:#d4a84b;font-weight:500;text-transform:none;letter-spacing:0;margin-left:6px;background:#fff8ec;padding:2px 8px;border-radius:20px;border:1px solid #f0dba8;">&#128274; cannot be changed</span>
+										</label>
+										<input type="text" name="number_plate" id="ac_plate" class="ac-input" readonly value={{car.number_plate}} required>
+										<div class="ac-err" id="err_ac_plate">&#9888; Number plate is required</div>
+									</div>
+									<div style="flex:1;">
+										<label class="ac-label">Seating Capacity <span class="ac-req">*</span></label>
+										<div style="position:relative;">
+											<select name="seats" id="ac_seats" class="ac-input" required style="appearance:none;padding-right:36px;cursor:pointer;">
+												<option value="">Select seats…</option>
+												<option value="2" {% if car.seats == 2 %}selected{% endif %}>2 Seater</option>
+												<option value="4" {% if car.seats == 4 %}selected{% endif %}>4 Seater</option>
+												<option value="5" {% if car.seats == 5 %}selected{% endif %}>5 Seater</option>
+												<option value="7" {% if car.seats == 7 %}selected{% endif %}>7 Seater</option>
+												<option value="8" {% if car.seats == 8 %}selected{% endif %}>8 Seater</option>
+												<option value="12" {% if car.seats == 12 %}selected{% endif %}>12 Seater</option>
+											</select>
+											<span style="position:absolute;right:13px;top:50%;transform:translateY(-50%);pointer-events:none;color:#bbb;font-size:12px;">&#9660;</span>
+										</div>
+										<div class="ac-err" id="err_ac_seats">&#9888; Seating capacity is required</div>
+									</div>
+								</div>
+
+								<!-- Section: Type & Features -->
+								<div class="ac-section-label">
+									<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c8a84b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+									Type &amp; Features
+								</div>
+
+								<div style="display:flex;gap:16px;margin-bottom:20px;">
+									<div style="flex:1;">
+										<label class="ac-label">Car Type <span class="ac-req">*</span></label>
+										<div style="position:relative;">
+											<select name="car_type" id="ac_type" class="ac-input" required style="appearance:none;padding-right:36px;cursor:pointer;">
+												<option value="sedan" {% if car.car_type == "sedan" %}selected{% endif %}>Sedan</option>
+												<option value="suv" {% if car.car_type == "suv" %}selected{% endif %}>SUV</option>
+												<option value="hatchback" {% if car.car_type == "hatchback" %}selected{% endif %}>Hatchback</option>
+												<option value="mpv" {% if car.car_type == "mpv" %}selected{% endif %}>MPV / Van</option>
+												<option value="convertible" {% if car.car_type == "convertible" %}selected{% endif %}>Convertible</option>
+												<option value="luxury" {% if car.car_type == "luxury" %}selected{% endif %}>Luxury</option>
+												<option value="pickup" {% if car.car_type == "pickup" %}selected{% endif %}>Pickup Truck</option>
+											</select>
+											<span style="position:absolute;right:13px;top:50%;transform:translateY(-50%);pointer-events:none;color:#bbb;font-size:12px;">&#9660;</span>
+										</div>
+										<div class="ac-err" id="err_ac_type">&#9888; Car type is required</div>
+									</div>
+									<div style="flex:1;">
+										<label class="ac-label">Fuel Type <span class="ac-req">*</span></label>
+										<div style="position:relative;">
+											<select name="fuel_type" id="ac_fuel" class="ac-input" required style="appearance:none;padding-right:36px;cursor:pointer;">
+												<option value="petrol" {% if car.fuel_type == "petrol" %}selected{% endif %}>Petrol</option>
+												<option value="diesel" {% if car.fuel_type == "diesel" %}selected{% endif %}>Diesel</option>
+												<option value="cng" {% if car.fuel_type == "cng" %}selected{% endif %}>CNG</option>
+												<option value="electric" {% if car.fuel_type == "electric" %}selected{% endif %}>Electric</option>
+												<option value="hybrid" {% if car.fuel_type == "hybrid" %}selected{% endif %}>Hybrid</option>
+											</select>
+											<span style="position:absolute;right:13px;top:50%;transform:translateY(-50%);pointer-events:none;color:#bbb;font-size:12px;">&#9660;</span>
+										</div>
+										<div class="ac-err" id="err_ac_fuel">&#9888; Fuel type is required</div>
+									</div>
+								</div>
+
+								<div style="display:flex;gap:16px;margin-bottom:28px;">
+									<div style="flex:1;">
+										<label class="ac-label">Transmission <span class="ac-req">*</span></label>
+										<div style="position:relative;">
+											<select name="transmission" id="ac_trans" class="ac-input" required style="appearance:none;padding-right:36px;cursor:pointer;">
+												<option value="">Select…</option>
+
+												<option value="manual" {% if car.transmission == "manual" %}selected{% endif %}>
+													Manual
+												</option>
+
+												<option value="automatic" {% if car.transmission == "automatic" %}selected{% endif %}>
+													Automatic
+												</option>
+											</select>
+											<span style="position:absolute;right:13px;top:50%;transform:translateY(-50%);pointer-events:none;color:#bbb;font-size:12px;">&#9660;</span>
+										</div>
+										<div class="ac-err" id="err_ac_trans">&#9888; Transmission is required</div>
+									</div>
+								</div>
+
+								<!-- Car Features Grid -->
+								<div style="margin-bottom:28px;">
+									<label class="ac-label">Car Features</label>
+									<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px;">
+
+										<label class="ac-feature-box">
+											<input type="checkbox" name="has_ac"
+                                                {% if car.has_ac %}checked{% endif %} value="1">
+											<span class="ac-feature-icon">❄️</span>
+											<span>Air Conditioning</span>
+										</label>
+										<label class="ac-feature-box">
+											<input type="checkbox" name="has_gps" 
+                                                    {% if car.has_gps%}checked{% endif %} value="1">
+											<span class="ac-feature-icon">🗺️</span>
+											<span>GPS Navigation</span>
+										</label>
+										<label class="ac-feature-box">
+											<input type="checkbox" name="has_music" 
+                                                    {% if car.has_music %}checked{% endif %} value="1">
+											<span class="ac-feature-icon">🎵</span>
+											<span>Music System</span>
+										</label>
+										<label class="ac-feature-box">
+											<input type="checkbox" name="has_bluetooth" 
+                                                    {% if car.has_bluetooth %}checked{% endif %} value="1">
+											<span class="ac-feature-icon">📶</span>
+											<span>Bluetooth</span>
+										</label>
+										<label class="ac-feature-box">
+											<input type="checkbox" name="has_usb" 
+                                                    {% if car.has_usb %}checked{% endif %} value="1">
+											<span class="ac-feature-icon">🔌</span>
+											<span>USB Charging</span>
+										</label>
+										<label class="ac-feature-box">
+											<input type="checkbox" name="has_sunroof" 
+                                                    {% if car.has_sunroof %}checked{% endif %} value="1">
+											<span class="ac-feature-icon">🌤️</span>
+											<span>Sunroof</span>
+										</label>
+										<label class="ac-feature-box">
+											<input type="checkbox" name="has_rear_camera"
+                                                    {% if car.has_rear_cemera %}checked{% endif %} value="1">
+											<span class="ac-feature-icon">📷</span>
+											<span>Rear Camera</span>
+										</label>
+										<label class="ac-feature-box">
+											<input type="checkbox" name="has_airbags" 
+                                                    {% if car.has_arbags %}checked{% endif %} value="1">
+											<span class="ac-feature-icon">🛡️</span>
+											<span>Airbags</span>
+										</label>
+										<label class="ac-feature-box">
+											<input type="checkbox" name="has_abs" 
+                                                    {% if car.has_abs %}checked{% endif %} value="1">
+											<span class="ac-feature-icon">🔧</span>
+											<span>ABS Brakes</span>
+										</label>
+										<label class="ac-feature-box">
+											<input type="checkbox" name="has_cruise"
+                                                    {% if car.has_cruise %}checked{% endif %} value="1">
+											<span class="ac-feature-icon">🚗</span>
+											<span>Cruise Control</span>
+										</label>
+										<label class="ac-feature-box">
+											<input type="checkbox" name="has_power_windows"
+                                                    {% if car.has_power_windows %}checked{% endif %} value="1">
+											<span class="ac-feature-icon">🪟</span>
+											<span>Power Windows</span>
+										</label>
+										<label class="ac-feature-box">
+											<input type="checkbox" name="has_central_lock"
+                                                    {% if car.has_central_lock %}checked{% endif %} value="1">
+											<span class="ac-feature-icon">🔒</span>
+											<span>Central Locking</span>
+										</label>
+										<label class="ac-feature-box">
+											<input type="checkbox" name="has_parking_sensor"
+                                                    {% if car.has_has_parking_sensor %}checked{% endif %} value="1">
+											<span class="ac-feature-icon">📡</span>
+											<span>Parking Sensor</span>
+										</label>
+										<label class="ac-feature-box">
+											<input type="checkbox" name="has_spare_tyre"
+                                                    {% if car.has_spare_tyre %}checked{% endif %} value="1">
+											<span class="ac-feature-icon">🔄</span>
+											<span>Spare Tyre</span>
+										</label>
+										<label class="ac-feature-box">
+											<input type="checkbox" name="has_first_aid"
+                                                    {% if car.has_first_aid %}checked{% endif %} value="1">
+											<span class="ac-feature-icon">🩹</span>
+											<span>First Aid Kit</span>
+										</label>
+
+									</div>
+								</div>
+
+								<!-- Section: Pricing & Location -->
+								<div class="ac-section-label">
+									<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c8a84b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+									Pricing &amp; Location
+								</div>
+
+								<div style="display:flex;gap:16px;margin-bottom:20px;">
+									<div style="flex:1;">
+										<label class="ac-label">Price per Day (₹) <span class="ac-req">*</span></label>
+										<input type="number" name="price_per_day" id="ac_price" class="ac-input" placeholder="e.g. 1500" min="1" value={{car.price_per_day}} required>
+										<div class="ac-err" id="err_ac_price">&#9888; Price is required</div>
+									</div>
+									<div style="flex:1;">
+										<label class="ac-label">City <span class="ac-req">*</span></label>
+										<input type="text" name="city" id="ac_city" class="ac-input" placeholder="e.g. Ahmedabad" value={{car.city}} required>
+										<div class="ac-err" id="err_ac_city">&#9888; City is required</div>
+									</div>
+								</div>
+
+								<div style="margin-bottom:28px;">
+									<label class="ac-label">Pickup Address <span class="ac-req">*</span></label>
+									<input type="text" name="pickup_address" id="ac_address" class="ac-input" placeholder="Full pickup address" value={{car.pickup_address}} required>
+									<div class="ac-err" id="err_ac_address">&#9888; Pickup address is required</div>
+								</div>
+
+								<!-- Section: Photos -->
+								<div class="ac-section-label">
+									<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c8a84b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+									Car Photos
+								</div>
+
+								<div style="margin-bottom:20px;">
+									<label class="ac-label">Main Photo <span class="ac-req">*</span></label>
+									<div id="photo_drop_area" onclick="document.getElementById('main_photo_input').click()" style="border:1.5px dashed #d4a84b;border-radius:8px;padding:24px 16px;text-align:center;cursor:pointer;background:#fffdf7;">
+										<div id="photo_placeholder" >
+											<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#d4a84b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:6px;">
+												<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+												<circle cx="12" cy="13" r="4"/>
+											</svg>
+											<p style="color:#aaa;font-size:13px;margin:0;">Click to upload<br><span style="font-size:11px;">JPG, PNG — up to 5MB</span></p>
+										</div>
+										<img id="photo_preview" src="" alt="" style="display:none;max-height:140px;border-radius:6px;object-fit:cover;max-width:100%;" >
+									</div>
+									<img src="{{ car.main_photo.url }}" alt="main photo" >
+									<input type="file" id="main_photo_input" name="main_photo" accept="image/*" style="display:none;"  required >
+									<div class="ac-err" id="err_ac_photo">&#9888; Main photo is required</div>
+								</div>
+
+								<div style="margin-bottom:28px;">
+									<label class="ac-label">Additional Photos <span style="font-size:10px;color:#bbb;font-weight:400;text-transform:none;letter-spacing:0;">(optional, up to 5)</span></label>
+									<input type="file" name="extra_photos" accept="image/*" multiple class="ac-input" style="padding:10px 14px;cursor:pointer;">
+								</div>
+
+								<!-- Description -->
+								<div style="margin-bottom:32px;">
+									<label class="ac-label">Description</label>
+									<textarea name="description" class="ac-input" rows="4" placeholder="Describe your car — condition, features, rules..." style="resize:vertical;padding-top:12px;"></textarea>
+								</div>
+
+								<!-- Submit -->
+								<button type="button" onclick="validateCarForm()" style="
+									width:100%;padding:16px;border:none;border-radius:9px;cursor:pointer;
+									background:linear-gradient(90deg,#c8922a,#d4a84b);color:#fff;
+									font-size:13px;letter-spacing:2.5px;text-transform:uppercase;
+									font-weight:800;transition:opacity .2s,transform .1s;
+									box-shadow:0 4px 18px rgba(212,168,75,0.40);"
+									onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'"
+									onmousedown="this.style.transform='scale(.99)'" onmouseup="this.style.transform='scale(1)'">
+									EDIT CAR &rarr;
+								</button>
+
+							</form>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- About -->
+	<div class="about">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-5">
+					<div class="about_image"><img src="{% static 'images/man.png' %}" alt=""></div>
+				</div>
+				<div class="col-lg-4">
+					<div class="about_content">
+						<div class="logo_container about_logo">
+							<div class="logo"><a href="#"><img src="{% static 'images/logo.png' %}" alt="">travelix</a></div>
+						</div>
+						<p class="about_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus quis vulputate eros, iaculis consequat nisl. Nunc et suscipit urna.</p>
+						<ul class="about_social_list">
+							<li class="about_social_item"><a href="#"><i class="fa fa-pinterest"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-facebook-f"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-twitter"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-dribbble"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-behance"></i></a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-lg-3">
+					<div class="about_info">
+						<ul class="contact_info_list">
+							<li class="contact_info_item d-flex flex-row">
+								<div><div class="contact_info_icon"><img src="{% static 'images/placeholder.svg' %}" alt=""></div></div>
+								<div class="contact_info_text">4127 Raoul Wallenber 45b-c Gibraltar</div>
+							</li>
+							<li class="contact_info_item d-flex flex-row">
+								<div><div class="contact_info_icon"><img src="{% static 'images/phone-call.svg' %}" alt=""></div></div>
+								<div class="contact_info_text">2556-808-8613</div>
+							</li>
+							<li class="contact_info_item d-flex flex-row">
+								<div><div class="contact_info_icon"><img src="{% static 'images/message.svg' %}" alt=""></div></div>
+								<div class="contact_info_text"><a href="mailto:contactme@gmail.com?Subject=Hello" target="_top">contactme@gmail.com</a></div>
+							</li>
+							<li class="contact_info_item d-flex flex-row">
+								<div><div class="contact_info_icon"><img src="{% static 'images/planet-earth.svg' %}" alt=""></div></div>
+								<div class="contact_info_text"><a href="https://colorlib.com">www.colorlib.com</a></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Footer -->
+
+	<style>
+		@keyframes shimmer { 0%{background-position:0%} 100%{background-position:200%} }
+
+		.ac-section-label {
+			display:flex;align-items:center;gap:8px;
+			font-size:10.5px;font-weight:800;letter-spacing:2.5px;
+			text-transform:uppercase;color:#c8a84b;
+			margin-bottom:20px;
+		}
+		.ac-section-label::after { content:'';flex:1;height:1px;background:#f0f0f0; }
+		.ac-label {
+			display:block;font-size:11px;font-weight:700;color:#999;
+			letter-spacing:.8px;text-transform:uppercase;margin-bottom:7px;
+		}
+		.ac-req { color:#d4a84b; }
+		.ac-input {
+			width:100%;padding:12px 14px;
+			border:1.5px solid #e8e8e8;border-radius:8px;
+			font-size:14px;color:#333;outline:none;
+			transition:border .2s,box-shadow .2s;
+			box-sizing:border-box;background:#fff;
+		}
+		.ac-input:focus {
+			border-color:#d4a84b;
+			box-shadow:0 0 0 3px rgba(212,168,75,0.13);
+		}
+		.ac-input.ac-error {
+			border-color:#e74c3c !important;
+			box-shadow:0 0 0 3px rgba(231,76,60,0.10) !important;
+			animation:shake .3s ease;
+		}
+		.ac-err {
+			display:none;font-size:11.5px;color:#e74c3c;
+			margin-top:5px;font-weight:600;
+		}
+		.ac-err.show { display:block; }
+		#photo_drop_area:hover { background:#fff8ec !important; }
+		.ac-feature-box {
+			display:flex;flex-direction:column;align-items:center;justify-content:center;
+			gap:5px;padding:12px 8px;border:1.5px solid #e8e8e8;border-radius:8px;
+			cursor:pointer;font-size:12px;color:#777;text-align:center;
+			transition:border-color .2s, background .2s;
+			user-select:none;
+		}
+		.ac-feature-box input[type="checkbox"] { display:none; }
+		.ac-feature-box:hover { border-color:#d4a84b; background:#fffdf7; }
+		.ac-feature-box:has(input:checked) {
+			border-color:#d4a84b;background:#fffbf0;color:#c8922a;font-weight:600;
+		}
+		.ac-feature-icon { font-size:20px;line-height:1; }
+		@keyframes shake {
+			0%,100%{transform:translateX(0)}
+			25%{transform:translateX(-5px)}
+			75%{transform:translateX(5px)}
+		}
+	</style>
+
+	<script>
+		document.getElementById('main_photo_input').addEventListener('change', function(){
+			if(this.files[0]) {
+				var r = new FileReader();
+				r.onload = function(e){
+					document.getElementById('photo_preview').src = e.target.result;
+					document.getElementById('photo_preview').style.display = 'block';
+					document.getElementById('photo_placeholder').style.display = 'none';
+					document.getElementById('err_ac_photo').classList.remove('show');
+				};
+				r.readAsDataURL(this.files[0]);
+			}
+		});
+
+		document.querySelectorAll('.ac-input').forEach(function(el){
+			el.addEventListener('input',  function(){ el.classList.remove('ac-error'); var e=document.getElementById('err_'+el.id); if(e) e.classList.remove('show'); });
+			el.addEventListener('change', function(){ el.classList.remove('ac-error'); var e=document.getElementById('err_'+el.id); if(e) e.classList.remove('show'); });
+		});
+
+		function validateCarForm(){
+			var ok = true;
+			function check(id, cond){
+				var el=document.getElementById(id), er=document.getElementById('err_'+id);
+				if(!el) return;
+				if(cond){ el.classList.add('ac-error'); if(er) er.classList.add('show'); if(ok){ el.focus(); } ok=false; }
+				else { el.classList.remove('ac-error'); if(er) er.classList.remove('show'); }
+			}
+			check('ac_brand',  !document.getElementById('ac_brand').value.trim());
+			check('ac_model',  !document.getElementById('ac_model').value.trim());
+			check('ac_year',   !document.getElementById('ac_year').value || +document.getElementById('ac_year').value < 2000);
+			check('ac_plate',  !document.getElementById('ac_plate').value.trim());
+			check('ac_seats',  !document.getElementById('ac_seats').value);
+			check('ac_type',   !document.getElementById('ac_type').value);
+			check('ac_fuel',   !document.getElementById('ac_fuel').value);
+			check('ac_trans',  !document.getElementById('ac_trans').value);
+			check('ac_price',  !document.getElementById('ac_price').value || +document.getElementById('ac_price').value < 1);
+			check('ac_city',   !document.getElementById('ac_city').value.trim());
+			check('ac_address',!document.getElementById('ac_address').value.trim());
+
+			var photoInput = document.getElementById('main_photo_input');
+			if(!photoInput.files || !photoInput.files[0]){
+				document.getElementById('photo_drop_area').style.borderColor = '#e74c3c';
+				document.getElementById('err_ac_photo').classList.add('show');
+				if(ok) document.getElementById('photo_drop_area').scrollIntoView({behavior:'smooth'});
+				ok = false;
+			}
+			if(ok) document.getElementById('add_car_form').submit();
+		}
+	</script>
+
+{% endblock %}

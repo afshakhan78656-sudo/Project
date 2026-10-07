@@ -1,0 +1,388 @@
+{% extends 'header.html' %}
+{% load static %}
+{% block content %}
+
+	<!-- Mobile Menu -->
+	<div class="menu trans_500">
+		<div class="menu_content d-flex flex-column align-items-center justify-content-center text-center">
+			<div class="menu_close_container"><div class="menu_close"></div></div>
+			<div class="logo menu_logo"><a href="#"><img src="{% static 'images/logo.png' %}" alt=""></a></div>
+			<ul>
+				<li class="menu_item"><a href="{% url 'index' %}">home</a></li>
+				<li class="menu_item"><a href="{% url 'add_car' %}">Add Car</a></li>
+				<li class="menu_item"><a href="{% url 'view_car' %}">My Cars</a></li>
+				<li class="menu_item"><a href="{% url 'contact' %}">contact</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<!-- Home Banner -->
+	<div class="home" style="height:40vh;min-height:300px;">
+		<div class="home_background parallax-window" data-parallax="scroll" data-image-src="{% static 'images/contact_background.jpg' %}"></div>
+		<div class="home_content" style="top:50%;">
+			<div class="home_title">My Listed Cars</div>
+		</div>
+	</div>
+
+	<!-- Delete Confirm Modal -->
+	<div id="delete_modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);align-items:center;justify-content:center;">
+		<div style="background:#fff;border-radius:14px;padding:40px 36px;max-width:400px;width:90%;text-align:center;box-shadow:0 12px 48px rgba(0,0,0,0.18);">
+			<div style="width:56px;height:56px;background:#fff5f5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
+				<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+					<path d="M10 11v6"/><path d="M14 11v6"/>
+					<path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+				</svg>
+			</div>
+			<h3 style="font-size:18px;font-weight:800;color:#1a1a1a;margin:0 0 10px;">Delete Car?</h3>
+			<p id="delete_car_name" style="font-size:13.5px;color:#999;margin:0 0 28px;"></p>
+			<div style="display:flex;gap:12px;">
+				<button onclick="closeDeleteModal()" style="flex:1;padding:13px;border:1.5px solid #e8e8e8;border-radius:8px;background:#fff;font-size:13px;font-weight:700;color:#999;cursor:pointer;">Cancel</button>
+				<form id="delete_form" method="POST" style="flex:1;">
+					{% csrf_token %}
+					<button type="submit" style="width:100%;padding:13px;border:none;border-radius:8px;background:#e74c3c;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">Yes, Delete</button>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<!-- Cars Section -->
+	<div style="background:#f9f9f9;padding:60px 0 80px;">
+		<div class="container">
+
+			<!-- Filter Bar -->
+			<div style="background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.07);padding:24px 28px;margin-bottom:32px;">
+				<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;">
+
+					<div style="flex:2;min-width:160px;">
+						<label class="vc-label">Search</label>
+						<div style="position:relative;">
+							<span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#bbb;">
+								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+							</span>
+							<input type="text" id="vc_search" class="vc-filter-input" placeholder="Brand, Model, City..." style="padding-left:36px;" oninput="filterCars()">
+						</div>
+					</div>
+
+					<div style="flex:1;min-width:130px;">
+						<label class="vc-label">Car Type</label>
+						<select id="vc_type" class="vc-filter-input" onchange="filterCars()">
+							<option value="">All Types</option>
+							<option value="sedan">Sedan</option>
+							<option value="suv">SUV</option>
+							<option value="hatchback">Hatchback</option>
+							<option value="mpv">MPV / Van</option>
+							<option value="luxury">Luxury</option>
+							<option value="convertible">Convertible</option>
+							<option value="pickup">Pickup Truck</option>
+						</select>
+					</div>
+
+					<div style="flex:1;min-width:130px;">
+						<label class="vc-label">Fuel Type</label>
+						<select id="vc_fuel" class="vc-filter-input" onchange="filterCars()">
+							<option value="">All Fuels</option>
+							<option value="petrol">Petrol</option>
+							<option value="diesel">Diesel</option>
+							<option value="cng">CNG</option>
+							<option value="electric">Electric</option>
+							<option value="hybrid">Hybrid</option>
+						</select>
+					</div>
+
+					<div style="flex:1;min-width:130px;">
+						<label class="vc-label">Transmission</label>
+						<select id="vc_trans" class="vc-filter-input" onchange="filterCars()">
+							<option value="">All</option>
+							<option value="manual">Manual</option>
+							<option value="automatic">Automatic</option>
+						</select>
+					</div>
+
+					<div style="flex:0;">
+						<button onclick="clearFilters()" style="padding:11px 20px;border:1.5px solid #e8e8e8;border-radius:8px;background:#fff;font-size:12px;color:#999;cursor:pointer;font-weight:600;white-space:nowrap;">
+							✕ Clear
+						</button>
+					</div>
+
+				</div>
+			</div>
+
+			<!-- Top Bar -->
+			<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;flex-wrap:wrap;gap:14px;">
+				<div>
+					<h2 style="font-size:22px;font-weight:800;color:#1a1a1a;margin:0 0 4px;">My Cars</h2>
+					<p style="font-size:13px;color:#aaa;margin:0;">
+						You have <strong style="color:#31124b;">{{ cars|length }}</strong> car{{ cars|length|pluralize }} listed
+					</p>
+				</div>
+				<a href="{% url 'add_car' %}" style="padding:13px 28px;background:linear-gradient(90deg,#c8922a,#d4a84b);color:#fff;border-radius:9px;text-decoration:none;font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;box-shadow:0 4px 16px rgba(212,168,75,0.35);">
+					+ Add New Car
+				</a>
+			</div>
+
+			{% if messages %}
+				{% for message in messages %}
+				<div style="background:{% if 'error' in message.tags %}#fff5f5{% else %}#f0fff4{% endif %};color:{% if 'error' in message.tags %}#c0392b{% else %}#27ae60{% endif %};border-left:3px solid {% if 'error' in message.tags %}#e74c3c{% else %}#27ae60{% endif %};padding:13px 18px;border-radius:8px;margin-bottom:24px;font-size:13.5px;">
+					{{ message }}
+				</div>
+				{% endfor %}
+			{% endif %}
+
+			{% if cars %}
+
+			<!-- 3 Column Grid -->
+			<div id="cars_grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:26px;">
+
+				{% for car in cars %}
+				<div class="vc-card"
+					data-brand="{{ car.brand|lower }}"
+					data-model="{{ car.model|lower }}"
+					data-city="{{ car.city|lower }}"
+					data-type="{{ car.car_type|lower }}"
+					data-fuel="{{ car.fuel_type|lower }}"
+					data-trans="{{ car.transmission|lower }}"
+					style="background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.07);overflow:hidden;transition:transform .3s,box-shadow .3s;" onmouseover="this.style.transform='translateY(-6px)';this.style.boxShadow='0 14px 36px rgba(0,0,0,0.13)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.07)'">
+
+					<!-- Car Image -->
+					<div style="position:relative;height:200px;background:#f5f5f5;overflow:hidden;">
+						{% if car.main_photo %}
+						<img src="{{ car.main_photo.url }}" alt="{{ car.brand }} {{ car.model }}"
+							style="width:100%;height:100%;object-fit:cover;transition:transform .4s;">
+						{% else %}
+						<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+							<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#e0e0e0" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+								<rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v4h-7V8z"/>
+								<circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+							</svg>
+						</div>
+						{% endif %}
+
+						<!-- Price Badge -->
+						<div style="position:absolute;top:14px;right:14px;background:linear-gradient(90deg,#c8922a,#d4a84b);color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;box-shadow:0 2px 10px rgba(212,168,75,0.4);">
+							₹{{ car.price_per_day }}<span style="font-size:10px;font-weight:500;">/day</span>
+						</div>
+
+						<!-- Car Type Badge -->
+						<div style="position:absolute;top:14px;left:14px;background:rgba(49,18,75,0.82);color:#fff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;">
+							{{ car.car_type }}
+						</div>
+					</div>
+
+					<!-- Card Body -->
+					<div style="padding:20px 22px;">
+
+						<!-- Name & Year -->
+						<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+							<h3 style="font-size:17px;font-weight:800;color:#1a1a1a;margin:0;">{{ car.brand }} {{ car.model }}</h3>
+							<span style="font-size:12px;color:#bbb;font-weight:600;">{{ car.year }}</span>
+						</div>
+
+						<!-- City -->
+						<div style="display:flex;align-items:center;gap:5px;margin-bottom:14px;">
+							<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d4a84b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+							<span style="font-size:13px;color:#999;">{{ car.city }}</span>
+						</div>
+
+						<!-- Specs Row -->
+						<div style="display:flex;border:1px solid #f0f0f0;border-radius:8px;overflow:hidden;margin-bottom:14px;">
+							<div class="vc-spec">
+								<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c8a84b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+								{{ car.seats }} Seats
+							</div>
+							<div class="vc-spec" style="border-left:1px solid #f0f0f0;">
+								<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c8a84b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg>
+								{{ car.fuel_type|capfirst }}
+							</div>
+							<div class="vc-spec" style="border-left:1px solid #f0f0f0;">
+								<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#c8a84b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+								{{ car.transmission|capfirst }}
+							</div>
+						</div>
+
+						<!-- Feature Tags -->
+						<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px;min-height:26px;">
+							{% if car.has_ac %}<span class="vc-tag">❄️ AC</span>{% endif %}
+							{% if car.has_gps %}<span class="vc-tag">🗺️ GPS</span>{% endif %}
+							{% if car.has_music %}<span class="vc-tag">🎵 Music</span>{% endif %}
+							{% if car.has_bluetooth %}<span class="vc-tag">📶 BT</span>{% endif %}
+							{% if car.has_usb %}<span class="vc-tag">🔌 USB</span>{% endif %}
+							{% if car.has_sunroof %}<span class="vc-tag">🌤️ Sunroof</span>{% endif %}
+							{% if car.has_rear_camera %}<span class="vc-tag">📷 Cam</span>{% endif %}
+							{% if car.has_airbags %}<span class="vc-tag">🛡️ Airbags</span>{% endif %}
+							{% if car.has_abs %}<span class="vc-tag">🔧 ABS</span>{% endif %}
+							{% if car.has_cruise %}<span class="vc-tag">🚗 Cruise</span>{% endif %}
+							{% if car.has_power_windows %}<span class="vc-tag">🪟 P.Win</span>{% endif %}
+							{% if car.has_central_lock %}<span class="vc-tag">🔒 Lock</span>{% endif %}
+							{% if car.has_parking_sensor %}<span class="vc-tag">📡 Sensor</span>{% endif %}
+							{% if car.has_spare_tyre %}<span class="vc-tag">🔄 Spare</span>{% endif %}
+							{% if car.has_first_aid %}<span class="vc-tag">🩹 Aid</span>{% endif %}
+						</div>
+
+						<!-- Edit & Delete Buttons -->
+						<div style="display:flex;gap:10px;">
+							<a href="{% url 'edit_car' car.id %}" style="flex:1;padding:11px;text-align:center;border-radius:8px;background:linear-gradient(90deg,#c8922a,#d4a84b);color:#fff;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-decoration:none;">
+								✏️ Edit
+							</a>
+							<button onclick="openDeleteModal('{{ car.brand }} {{ car.model }}', '{% url 'delete_car' car.id %}')"
+								style="flex:1;padding:11px;border-radius:8px;border:1.5px solid #fdd;background:#fff;color:#e74c3c;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;">
+								🗑️ Delete
+							</button>
+						</div>
+
+					</div>
+				</div>
+				{% endfor %}
+
+			</div>
+
+			{% else %}
+
+			<!-- Empty State -->
+			<div style="text-align:center;padding:80px 20px;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.05);">
+				<svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#e8e8e8" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:20px;">
+					<rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v4h-7V8z"/>
+					<circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+				</svg>
+				<h3 style="font-size:18px;font-weight:800;color:#ccc;margin:0 0 8px;">No Cars Listed Yet</h3>
+				<p style="font-size:13px;color:#ddd;margin:0 0 28px;">Add your first car to start getting bookings!</p>
+				<a href="{% url 'add_car' %}" style="padding:14px 36px;background:linear-gradient(90deg,#c8922a,#d4a84b);color:#fff;border-radius:9px;text-decoration:none;font-size:13px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;">
+					+ Add Your First Car
+				</a>
+			</div>
+
+			{% endif %}
+
+		<!-- No filter result -->
+			<div id="no_filter_result" style="display:none;text-align:center;padding:50px 20px;">
+				<p style="font-size:15px;color:#bbb;margin:0;">No cars match your filters. <a href="#" onclick="clearFilters();return false;" style="color:#d4a84b;font-weight:700;">Clear filters</a></p>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- About -->
+	<div class="about">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-5">
+					<div class="about_image"><img src="{% static 'images/man.png' %}" alt=""></div>
+				</div>
+				<div class="col-lg-4">
+					<div class="about_content">
+						<div class="logo_container about_logo">
+							<div class="logo"><a href="#"><img src="{% static 'images/logo.png' %}" alt="">travelix</a></div>
+						</div>
+						<p class="about_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus quis vulputate eros, iaculis consequat nisl. Nunc et suscipit urna.</p>
+						<ul class="about_social_list">
+							<li class="about_social_item"><a href="#"><i class="fa fa-pinterest"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-facebook-f"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-twitter"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-dribbble"></i></a></li>
+							<li class="about_social_item"><a href="#"><i class="fa fa-behance"></i></a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="col-lg-3">
+					<div class="about_info">
+						<ul class="contact_info_list">
+							<li class="contact_info_item d-flex flex-row">
+								<div><div class="contact_info_icon"><img src="{% static 'images/placeholder.svg' %}" alt=""></div></div>
+								<div class="contact_info_text">4127 Raoul Wallenber 45b-c Gibraltar</div>
+							</li>
+							<li class="contact_info_item d-flex flex-row">
+								<div><div class="contact_info_icon"><img src="{% static 'images/phone-call.svg' %}" alt=""></div></div>
+								<div class="contact_info_text">2556-808-8613</div>
+							</li>
+							<li class="contact_info_item d-flex flex-row">
+								<div><div class="contact_info_icon"><img src="{% static 'images/message.svg' %}" alt=""></div></div>
+								<div class="contact_info_text"><a href="mailto:contactme@gmail.com?Subject=Hello" target="_top">contactme@gmail.com</a></div>
+							</li>
+							<li class="contact_info_item d-flex flex-row">
+								<div><div class="contact_info_icon"><img src="{% static 'images/planet-earth.svg' %}" alt=""></div></div>
+								<div class="contact_info_text"><a href="https://colorlib.com">www.colorlib.com</a></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Footer -->
+
+	<style>
+		.vc-label {
+			display:block;font-size:11px;font-weight:700;color:#999;
+			letter-spacing:.8px;text-transform:uppercase;margin-bottom:7px;
+		}
+		.vc-filter-input {
+			width:100%;padding:11px 14px;
+			border:1.5px solid #e8e8e8;border-radius:8px;
+			font-size:14px;color:#333;outline:none;
+			transition:border .2s,box-shadow .2s;
+			box-sizing:border-box;background:#fff;
+			appearance:none;
+		}
+		.vc-filter-input:focus { border-color:#d4a84b; box-shadow:0 0 0 3px rgba(212,168,75,0.13); }
+		.vc-spec {
+			flex:1;display:flex;flex-direction:column;align-items:center;
+			gap:5px;padding:10px 6px;font-size:11px;color:#999;font-weight:600;text-transform:capitalize;
+		}
+		.vc-tag {
+			font-size:11px;padding:3px 9px;border-radius:20px;
+			background:#f9f5ec;color:#c8922a;font-weight:600;
+		}
+		@media(max-width:992px){ #cars_grid{ grid-template-columns:repeat(2,1fr) !important; } }
+		@media(max-width:600px){ #cars_grid{ grid-template-columns:1fr !important; } }
+	</style>
+
+	<script>
+		function filterCars(){
+			var search = document.getElementById('vc_search').value.toLowerCase();
+			var type   = document.getElementById('vc_type').value.toLowerCase();
+			var fuel   = document.getElementById('vc_fuel').value.toLowerCase();
+			var trans  = document.getElementById('vc_trans').value.toLowerCase();
+
+			var cards   = document.querySelectorAll('.vc-card');
+			var visible = 0;
+
+			cards.forEach(function(card){
+				var matchSearch = !search || card.dataset.brand.includes(search) || card.dataset.model.includes(search) || card.dataset.city.includes(search);
+				var matchType   = !type  || card.dataset.type  === type;
+				var matchFuel   = !fuel  || card.dataset.fuel  === fuel;
+				var matchTrans  = !trans || card.dataset.trans === trans;
+
+				if(matchSearch && matchType && matchFuel && matchTrans){
+					card.style.display = 'block';
+					visible++;
+				} else {
+					card.style.display = 'none';
+				}
+			});
+
+			document.getElementById('no_filter_result').style.display = visible === 0 ? 'block' : 'none';
+		}
+
+		function clearFilters(){
+			document.getElementById('vc_search').value = '';
+			document.getElementById('vc_type').value   = '';
+			document.getElementById('vc_fuel').value   = '';
+			document.getElementById('vc_trans').value  = '';
+			filterCars();
+		}
+
+		function openDeleteModal(carName, deleteUrl) {
+			document.getElementById('delete_car_name').textContent = '"' + carName + '" delete karna chahte hain? Yeh action undo nahi hoga.';
+			document.getElementById('delete_form').action = deleteUrl;
+			document.getElementById('delete_modal').style.display = 'flex';
+			document.body.style.overflow = 'hidden';
+		}
+		function closeDeleteModal() {
+			document.getElementById('delete_modal').style.display = 'none';
+			document.body.style.overflow = '';
+		}
+		document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeDeleteModal(); });
+	</script>
+
+{% endblock %}
